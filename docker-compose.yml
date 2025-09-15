@@ -1,29 +1,47 @@
-version: "3.9"
+# version: "3.9"
 
 services:
   authservice:
-    build:
-      context: ./AuthService
-      dockerfile: Dockerfile
+    # build:
+    #   context: ./WebApiExample
+    #   dockerfile: Dockerfile
+    image: idgfauth:latest
     container_name: authservice
+    expose:
+      - "80"
+      - "443"
     ports:
-      - "7044:7044"
+      - "7044:80"
+    environment:
+      - ASPNETCORE_URLS=http://+:80
 
   coreservice:
-    build:
-      context: ./CoreService
-      dockerfile: Dockerfile
+    # build:
+    #   context: ./IDGF.Core
+    #   dockerfile: Dockerfile
+    image: idgfcore:latest
     container_name: coreservice
+    expose:
+      - "80"
+      - "443"
     ports:
-      - "7135:7135"
+      - "7135:80"
+    environment:
+      - ASPNETCORE_URLS=http://+:80
 
   gateway:
-    build:
-      context: ./Gateway
-      dockerfile: Dockerfile
+    # build:
+    #   context: ./IDGF.ReverseProxy
+    #   dockerfile: Dockerfile
+    image: idgfreverseproxy:latest
     container_name: gateway
+    expose:
+      - "80"
+      - "443"
     ports:
-      - "7074:7074"
+      - "7074:80"
+    environment:
+      - ASPNETCORE_URLS=http://+:80
     depends_on:
       - authservice
       - coreservice
