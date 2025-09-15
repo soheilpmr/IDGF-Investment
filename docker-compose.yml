@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  authservice:
+    build:
+      context: ./AuthService
+      dockerfile: Dockerfile
+    container_name: authservice
+    ports:
+      - "7044:7044"
+
+  coreservice:
+    build:
+      context: ./CoreService
+      dockerfile: Dockerfile
+    container_name: coreservice
+    ports:
+      - "7135:7135"
+
+  gateway:
+    build:
+      context: ./Gateway
+      dockerfile: Dockerfile
+    container_name: gateway
+    ports:
+      - "7074:7074"
+    depends_on:
+      - authservice
+      - coreservice
