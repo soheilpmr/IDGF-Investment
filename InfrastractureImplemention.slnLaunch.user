@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "WebApiExample\\IDGF-Auth.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "IDGF.ReverseProxy\\IDGF.ReverseProxy.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
