@@ -17,3 +17,11 @@
 /Migrations.SQL/obj
 /WebApiExample.DB/obj
 /WebApiExample/appsettings.Development.json
+/IDGF.Core/bin/Debug/net8.0
+/IDGF.ReverseProxy/obj
+/IDGF.Core/obj/Debug/net8.0/ref
+/IDGF.Core/obj/Debug/net8.0/refint
+/IDGF.Core/obj
+/IDGF.ReverseProxy/bin
+/IDGF.Core/obj/Debug/net8.0/IDGF.Core.AssemblyInfoInputs.cache
+/IDGF.Core/obj/Debug/net8.0/IDGF.Core.AssemblyInfo.cs
