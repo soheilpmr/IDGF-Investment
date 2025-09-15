@@ -172,7 +172,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMiddleware<JWTMiddleware>();
+//app.UseMiddleware<JWTMiddleware>();
 app.MapControllers();
 
 app.Run();

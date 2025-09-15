@@ -10,7 +10,8 @@ namespace IDGFAuth.Controllers
     public class TestApiController : BaseApiController
     {
         [HttpGet]
-        [IDGFAuth.Services.JWT.Middleware.Authorize]
+        //[IDGFAuth.Services.JWT.Middleware.Authorize]
+        [Authorize]
         [Route("Get")]
         public async Task<IActionResult> Get()
         {
