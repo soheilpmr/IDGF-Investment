@@ -1,0 +1,19 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/BackEndInfrsastructure/obj
+/.vs
+/WebApiExample/bin/Debug/net8.0
+/WebApiExample/obj
+/BackEndInfrsastructure/bin/Debug/net8.0
+/Migrations.Oracle/bin/Debug/net8.0
+/Migrations.Oracle/obj/Debug/net8.0
+/Migrations.SQL/bin/Debug/net8.0
+/Migrations.SQL/obj/Debug/net8.0
+/WebApiExample.DB/bin/Debug/net8.0
+/WebApiExample.DB/obj/Debug/net8.0
+/Migrations.Oracle/obj
+/Migrations.SQL/obj
+/WebApiExample.DB/obj
+/WebApiExample/appsettings.Development.json
