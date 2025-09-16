@@ -47,15 +47,18 @@ static string getConnectionStringOracle()
 // Add services to the container.
 
 #region JWT
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(x =>
-{
-    x.MapInboundClaims = false;
-    x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+//builder.Services.AddAuthentication(
+//    options =>
+//{
+//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+//}).AddJwtBearer(x =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+      .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => 
+{ 
+    options.MapInboundClaims = false;
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
     {
         ValidIssuer = builder.Configuration["JWTBearerSettings:Issuer"],
         ValidAudience = builder.Configuration["JWTBearerSettings:Audience"],
@@ -65,11 +68,20 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero,
-        RoleClaimType = JwtClaimTypes.Role,
-        NameClaimType = JwtClaimTypes.Name
+        RoleClaimType = JwtClaimTypes.Role
+        //NameClaimType = JwtClaimTypes.Name
     };
 });
 #endregion
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApiScope", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        //policy.RequireClaim("scope", "facilityman");
+    });
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

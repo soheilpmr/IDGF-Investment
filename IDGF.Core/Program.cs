@@ -1,3 +1,4 @@
+using IdentityModel;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -58,7 +59,8 @@ builder.Services.AddAuthentication("Bearer")
               ValidateLifetime = true,
               IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTBearerSettings:Key"])),
               ValidateIssuerSigningKey = true,
-              ClockSkew = TimeSpan.Zero
+              ClockSkew = TimeSpan.Zero,
+              RoleClaimType = JwtClaimTypes.Role
           };
       });
 

@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using IDGFAuth.Controllers;
 using IDGFAuth.Data.Entities;
+using IdentityModel;
 
 namespace IDGFAuth.Services.JWT
 {
@@ -25,36 +26,42 @@ namespace IDGFAuth.Services.JWT
 
         public async Task<string> GenerateToken(ApplicationUser user)
         {
-            var userClaims = await _userManager.GetClaimsAsync(user);
-
+            // 1. Get roles
             var userRoles = await _userManager.GetRolesAsync(user);
-
             var roleClaims = new List<Claim>();
 
             foreach (var roleName in userRoles)
             {
-                roleClaims.Add(new Claim(ClaimTypes.Role, roleName));
+                // Add role as claim
+                roleClaims.Add(new Claim(JwtClaimTypes.Role, roleName));
 
+                // Add role permissions
                 var role = await _roleManager.FindByNameAsync(roleName);
                 if (role != null)
                 {
                     var claimsForRole = await _roleManager.GetClaimsAsync(role);
-                    roleClaims.AddRange(claimsForRole);
+
+                    // Only include Permission claims
+                    roleClaims.AddRange(claimsForRole.Where(c => c.Type == "Permission"));
                 }
             }
 
+            // 2. Standard user claims
             var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            }
-            .Union(userClaims)
-            .Union(roleClaims);
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                };
 
+            // 3. Combine with role claims
+            claims.AddRange(roleClaims);
+
+            // 4. Signing key
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWTBearerSettings:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+            // 5. Create token with issuer and audience matching middleware
             var token = new JwtSecurityToken(
                 issuer: _config["JWTBearerSettings:Issuer"],
                 audience: _config["JWTBearerSettings:Audience"],
@@ -65,6 +72,7 @@ namespace IDGFAuth.Services.JWT
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
 
         public async Task<ApplicationUser?> GetUserByID(string userId)
         {

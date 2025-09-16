@@ -1,3 +1,4 @@
+using BackEndInfrastructure.CustomAttribute;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,8 +20,9 @@ namespace IDGF.Core.Controllers
             _logger = logger;
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet("GetWeatherForecast")]
+        [RequirePermission("CanDeleteInvoice")]
         public IEnumerable<WeatherForecast> Get()
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast

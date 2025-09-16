@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace IDGFAuth.Controllers
 {
@@ -16,29 +17,39 @@ namespace IDGFAuth.Controllers
             _userManager = userManager;
         }
 
-        [HttpPost("{userId}/roles")]
-        public async Task<IActionResult> AddRolesToUser(string userId, [FromBody] List<string> roles)
+        [HttpPost(nameof(AddRolesToUser))]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+        public async Task<IActionResult> AddRolesToUser(AddRolesToUserDto addRolesToUserDto)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            List<string> rtn = new List<string>()
+            {
+                addRolesToUserDto.roleName
+            };
+            var user = await _userManager.FindByIdAsync(addRolesToUserDto.userId);
             if (user == null)
-                return NotFound($"User with ID '{userId}' not found.");
+                return NotFound($"User with ID '{addRolesToUserDto.userId}' not found.");
 
-            var result = await _userManager.AddToRolesAsync(user, roles);
+            var result = await _userManager.AddToRolesAsync(user, rtn);
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
 
-            return Ok($"Roles {string.Join(", ", roles)} added to user '{user.UserName}'.");
+            return Ok($"Roles {string.Join(", ", rtn)} added to user '{user.UserName}'.");
         }
 
         [HttpPost("register")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         public async Task<IActionResult> Register([FromBody] RegisterUserDto dto)
         {
             var user = new ApplicationUser
             {
                 UserName = dto.UserName,
                 Email = dto.Email,
-                EmailConfirmed = true
+                EmailConfirmed = false,
+                FirstName = dto.firstName,
+                LastName = dto.lastName,
+                AccessFailedCount = 0,
+                LockoutEnabled = false,
+                TwoFactorEnabled = false
             };
 
             var result = await _userManager.CreateAsync(user, dto.Password);
@@ -50,4 +61,10 @@ namespace IDGFAuth.Controllers
         }
     }
 }
-public record RegisterUserDto(string UserName, string Email, string Password);
+public record RegisterUserDto(string UserName, string Email, string Password, string firstName, string lastName);
+
+public class AddRolesToUserDto
+{
+    public string userId { get; set; }
+    public string roleName { get; set; }
+}

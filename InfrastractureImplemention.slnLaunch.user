@@ -11,6 +11,10 @@
         "Path": "IDGF.Core\\IDGF.Core.csproj",
         "Action": "Start",
         "DebugTarget": "https"
+      },
+      {
+        "Path": "IDGF.ReverseProxy\\IDGF.ReverseProxy.csproj",
+        "Action": "Start"
       }
     ]
   }
