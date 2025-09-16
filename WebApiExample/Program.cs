@@ -17,7 +17,8 @@ using IDGFAuth.Infrastructure.Initializer;
 using IDGFAuth.Infrastructure.UnitOfWork;
 using IDGFAuth.Services;
 using IDGFAuth.Services.JWT;
-using IDGFAuth.Services.JWT.Middleware;
+using IdentityModel;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +54,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(x =>
 {
+    x.MapInboundClaims = false;
     x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
     {
         ValidIssuer = builder.Configuration["JWTBearerSettings:Issuer"],
@@ -63,11 +65,11 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero,
+        RoleClaimType = JwtClaimTypes.Role,
+        NameClaimType = JwtClaimTypes.Name
     };
 });
 #endregion
-
-builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -107,10 +109,20 @@ builder.Services.AddSwaggerGen(
         });
     });
 
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+})
+.AddEntityFrameworkStores<IDGFAuthDbContextSQL>()
+.AddDefaultTokenProviders();
+
 #region OracleRegistration
 //builder.Services.AddDbContext<WebApiDbContextOracle>((serviceProvider, options) =>
 //{
-   
+
 //});
 #endregion
 
@@ -124,8 +136,6 @@ builder.Services.AddDbContext<IDGFAuthDbContextSQL>(options =>
     ));
 
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<IDGFAuthDbContextSQL>();
 #endregion
 
 builder.Services.AddScoped<IWebApiUnitOfWorkAsync, WebApiUnitOfWorkAsync>();
@@ -152,7 +162,7 @@ using (var scope = app.Services.CreateScope())
     }
 
     var f = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
-    //f.Initialize();
+    f.Initialize();
 }
 
 // Configure the HTTP request pipeline.
@@ -169,7 +179,7 @@ if (app.Environment.EnvironmentName == "Docker")
 }
 
 app.UseHttpsRedirection();
-
+//app.UseMiddleware<JWTMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 //app.UseMiddleware<JWTMiddleware>();

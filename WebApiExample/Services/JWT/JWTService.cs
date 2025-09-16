@@ -12,50 +12,63 @@ namespace IDGFAuth.Services.JWT
 {
     public class JWTService : IJWTService
     {
-        private const string TokenSecret = "Xl2h0A+PVv8a5fK8f4x2RkYsnwZ+W04U2d8buwpHGoM=";
-        private readonly TimeSpan TokenLifeTime = TimeSpan.FromHours(8);
-
+        private readonly IConfiguration _config;
         private readonly UserManager<ApplicationUser> _userManager;
-        public JWTService(UserManager<ApplicationUser> userManager)
+        private readonly RoleManager<IdentityRole> _roleManager;
+
+        public JWTService(UserManager<ApplicationUser> userManager, IConfiguration config, RoleManager<IdentityRole> roleManager)
         {
-                _userManager = userManager;
+            _userManager = userManager;
+            _config = config;
+            _roleManager = roleManager;
         }
 
         public async Task<string> GenerateToken(ApplicationUser user)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(TokenSecret);
-            var claims = new List<Claim>()
+            var userClaims = await _userManager.GetClaimsAsync(user);
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            var roleClaims = new List<Claim>();
+
+            foreach (var roleName in userRoles)
             {
-                //new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                roleClaims.Add(new Claim(ClaimTypes.Role, roleName));
+
+                var role = await _roleManager.FindByNameAsync(roleName);
+                if (role != null)
+                {
+                    var claimsForRole = await _roleManager.GetClaimsAsync(role);
+                    roleClaims.AddRange(claimsForRole);
+                }
+            }
+
+            var claims = new List<Claim>
+            {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                //new Claim("userid", user.Id.ToString())
-            };
+                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            }
+            .Union(userClaims)
+            .Union(roleClaims);
 
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.Add(TokenLifeTime),
-                Issuer = "https://radin.tech/",
-                Audience = "https://usermangement.channel.com/",
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWTBearerSettings:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            };
+            var token = new JwtSecurityToken(
+                issuer: _config["JWTBearerSettings:Issuer"],
+                audience: _config["JWTBearerSettings:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(1),
+                signingCredentials: creds
+            );
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var jwt = tokenHandler.WriteToken(token);
-            return jwt;
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         public async Task<ApplicationUser?> GetUserByID(string userId)
         {
-            var rtn = await _userManager.FindByIdAsync(userId);
-            if (rtn == null)
-            {
-                return null;
-            }
-            return rtn;
+            return await _userManager.FindByIdAsync(userId);
         }
     }
 }

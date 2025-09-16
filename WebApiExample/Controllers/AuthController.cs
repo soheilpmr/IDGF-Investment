@@ -1,11 +1,7 @@
-using Microsoft.AspNetCore.Http;
+
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using IDGFAuth.Data.Entities;
 using IDGFAuth.Services.JWT;
 
@@ -26,12 +22,12 @@ namespace IDGFAuth.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<string>> Login([FromBody] LoginRequest request)
+        public async Task<ActionResult<string>> Login([FromBody] LoginRequestDTO request)
         {
             if (_hostingEnvironment.IsDevelopment())
             {
-                var user = await _userManager.FindByEmailAsync(request.Email);
-                if (user == null || !await _userManager.CheckPasswordAsync(user, request.Password))
+                var user = await _userManager.FindByNameAsync(request.username);
+                if (user == null || !await _userManager.CheckPasswordAsync(user, request.password))
                 {
                     return Unauthorized("Invalid username or password");
                 }
@@ -42,12 +38,12 @@ namespace IDGFAuth.Controllers
             }
             else
             {
-                if (request.Email != "admin@gmail.com" && request.Password != "Admin123*")
+                if (request.username != "admin@gmail.com" && request.password != "Admin123*")
                 {
                     return Unauthorized("Invalid username or password");
                 }
                 ApplicationUser applicationUser = new ApplicationUser();
-                applicationUser.Email = request.Email;
+                applicationUser.UserName = request.username;
                 applicationUser.Id = "27d131eb-0da6-4d8e-a70d-8ba9d8536810";
                 // Authentication successful, generate JWT
                 var token = await _jWTService.GenerateToken(applicationUser);
@@ -56,7 +52,7 @@ namespace IDGFAuth.Controllers
 
         }
     }
-
+    public record LoginRequestDTO(string username, string password);
     //public class TokenGenerationRequest
     //{
     //    public string UserID { get; set; }
