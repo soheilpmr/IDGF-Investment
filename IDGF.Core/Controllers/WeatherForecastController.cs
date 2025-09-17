@@ -33,5 +33,15 @@ namespace IDGF.Core.Controllers
             })
             .ToArray();
         }
+
+        [HttpGet(nameof(TestApi))]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+        //[Authorize]
+        public async Task<IActionResult> TestApi()
+        {
+            _logger.LogInformation("Core Service , TestApi called");
+            return StatusCode(200, "Test Successfully");
+        }
+
     }
 }

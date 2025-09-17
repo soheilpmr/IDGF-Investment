@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace BackEndInfrastructure.CustomAttribute
     {
 
         private readonly string _permission;
+        private readonly ILogger<RequirePermissionAttribute> _logger;
 
         public RequirePermissionAttribute(string permission)
         {
@@ -21,7 +23,9 @@ namespace BackEndInfrastructure.CustomAttribute
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
+          
             var t = context.HttpContext.User.Identity.IsAuthenticated;
+            Console.WriteLine("IsAuthenticated: " + t);
             var user = context.HttpContext.User;
             if (!user.HasClaim("Permission", _permission))
             {

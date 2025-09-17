@@ -1,4 +1,5 @@
 using IdentityModel;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -47,9 +48,10 @@ builder.Services.AddSwaggerGen(
     });
 
 
-builder.Services.AddAuthentication("Bearer")
-      .AddJwtBearer("Bearer", options =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+      .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
       {
+          options.MapInboundClaims = false;
           options.TokenValidationParameters = new TokenValidationParameters
           {
               ValidateIssuer = true,
@@ -82,8 +84,8 @@ if (app.Environment.EnvironmentName == "Docker")
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

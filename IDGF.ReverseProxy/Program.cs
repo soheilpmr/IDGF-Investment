@@ -7,22 +7,25 @@ using IdentityModel;
 var builder = WebApplication.CreateBuilder(args);
 
 // JWT Authentication
-builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer("Bearer", options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["JWTBearerSettings:Issuer"],
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["JWTBearerSettings:Audience"],
-            ValidateLifetime = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTBearerSettings:Key"])),
-            ValidateIssuerSigningKey = true,
-            ClockSkew = TimeSpan.Zero,
-            RoleClaimType = JwtClaimTypes.Role
-        };
-    });
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+      .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+      {
+          options.MapInboundClaims = false;
+          {
+              options.TokenValidationParameters = new TokenValidationParameters
+              {
+                  ValidateIssuer = true,
+                  ValidIssuer = builder.Configuration["JWTBearerSettings:Issuer"],
+                  ValidateAudience = true,
+                  ValidAudience = builder.Configuration["JWTBearerSettings:Audience"],
+                  ValidateLifetime = true,
+                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTBearerSettings:Key"])),
+                  ValidateIssuerSigningKey = true,
+                  ClockSkew = TimeSpan.Zero,
+                  RoleClaimType = JwtClaimTypes.Role
+              };
+          }
+      });
 
 
 builder.Services.AddAuthorization(options =>
