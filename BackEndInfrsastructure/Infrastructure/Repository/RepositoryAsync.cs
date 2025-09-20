@@ -12,10 +12,10 @@ namespace BackEndInfrastructure.Infrastructure.Repository
        where PrimaryKeyType : struct
 
     {
-        private readonly DbSet<DBModelEntity> _entity;
+        protected readonly DbSet<DBModelEntity> _entity;
         private readonly DataBase _dataBaseKind;
-        private readonly DbContext _dbContext;
-        public RepositoryAsync(DbContext dbContext, DataBase dataBaseKind)
+        protected readonly DbContext _dbContext;
+        public RepositoryAsync(DbContext dbContext, DataBase dataBaseKind = DataBase.SQLServer)
         {
             _dbContext = dbContext;
             _entity = _dbContext.Set<DBModelEntity>();

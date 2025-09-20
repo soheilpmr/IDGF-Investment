@@ -1,4 +1,7 @@
 using IdentityModel;
+using IDGF.Core.Data;
+using IDGF.Core.Infrastructure.UnitOfWork;
+using IDGF.Core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.IdentityModel.Tokens;
@@ -47,6 +50,10 @@ builder.Services.AddSwaggerGen(
         });
     });
 
+builder.Services.AddDbContext<CoreDbContext>();
+
+builder.Services.AddScoped<ICoreUnitOfWork, CoreUnitOfWork>();
+builder.Services.AddScoped<MandehtransactionService, MandehtransactionService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
       .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>

@@ -15,7 +15,6 @@ namespace BackEndInfrastructure.Infrastructure.Service
      where PrimaryKeyType : struct
     {
         protected readonly int _logBaseID;
-
         /// <summary>
         /// 
         /// </summary>

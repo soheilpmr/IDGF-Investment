@@ -19,7 +19,7 @@ namespace BackEndInfrastructure.DynamicLinqCore
         /// <param name="filter">Requested filters.</param>
 
         /// <returns>A LinqDataResult object populated from the processed IQueryable.</returns>
-        public static async Task<LinqDataResult<T>> ToLinqDataResultAsync<T>(this IQueryable<T> queryable, int take, int skip, IEnumerable<Sort> sort, Filter filter, DataBase dataBase)
+        public static async Task<LinqDataResult<T>> ToLinqDataResultAsync<T>(this IQueryable<T> queryable, int take, int skip, IEnumerable<Sort> sort, Filter filter, DataBase dataBase = DataBase.SQLServer)
         {
             var total = await queryable.CountAsync();
             var filteredCount = total;

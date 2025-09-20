@@ -6,13 +6,17 @@ namespace BackEndInfrastructure.Infrastructure.Exceptions
 {
     public class ServiceObjectNotFoundException : ServiceException
     {
-        public ServiceObjectNotFoundException(string message, Exception innerException) : base(message, innerException, 5)
+        public ServiceObjectNotFoundException(string message, Exception innerException, int codeException) : base(message, innerException, codeException + 5)
         {
 
         }
         public ServiceObjectNotFoundException(string message) : base(message)
         {
-            _code = 5;
+
+        }
+        public ServiceObjectNotFoundException(string message, int codeException) : base(message, codeException + 5)
+        {
+
         }
     }
 }
