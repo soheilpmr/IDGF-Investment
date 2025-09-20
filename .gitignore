@@ -27,3 +27,7 @@
 /IDGF.Core/obj/Debug/net8.0/IDGF.Core.AssemblyInfo.cs
 /obj/Docker
 /obj/Debug
+/IDGF.Core/IDGF.Core.csproj.user
+/IDGF.ReverseProxy/IDGF.ReverseProxy.csproj.user
+/WebApiExample/IDGF-Auth.csproj.user
+/InfrastractureImplemention.slnLaunch.user

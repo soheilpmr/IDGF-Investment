@@ -155,7 +155,15 @@ builder.Services.AddScoped<IWebApiUnitOfWorkAsync, WebApiUnitOfWorkAsync>();
 builder.Services.AddScoped<IJWTService, JWTService>();
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 // End Infrastructure Implemention
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -192,6 +200,8 @@ if (app.Environment.EnvironmentName == "Docker")
 
 app.UseHttpsRedirection();
 //app.UseMiddleware<JWTMiddleware>();
+app.UseCors("AllowAll");
+
 app.UseAuthentication();
 app.UseAuthorization();
 //app.UseMiddleware<JWTMiddleware>();

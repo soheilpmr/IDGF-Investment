@@ -34,7 +34,7 @@ namespace IDGFAuth.Controllers
 
                 // Authentication successful, generate JWT
                 var token = await _jWTService.GenerateToken(user);
-                return Ok(new { Token = token, Reslt = "Successfully Authorized" });
+                return Ok(new { Token = token, Result = "Successfully Authorized" });
             }
             else
             {
@@ -47,7 +47,7 @@ namespace IDGFAuth.Controllers
                 applicationUser.Id = "27d131eb-0da6-4d8e-a70d-8ba9d8536810";
                 // Authentication successful, generate JWT
                 var token = await _jWTService.GenerateToken(applicationUser);
-                return Ok(new { Token = token, Reslt = "Successfully Authorized" });
+                return Ok(new { Token = token, Result = "Successfully Authorized" });
             }
 
         }
