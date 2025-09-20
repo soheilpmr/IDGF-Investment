@@ -21,7 +21,7 @@ namespace IDGFAuth.Controllers
         [HttpPost(nameof(AddClaimsToRole))]
         //[RequirePermission("CanDeleteInvoice", AuthenticationSchemes = "Bearer")]
         //[Authorize]
-        [Authorize(AuthenticationSchemes ="Bearer", Roles = "Admin")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         public async Task<IActionResult> AddClaimsToRole([FromBody] AddClaimsToRoleDto dto)
         {
             var role = await _roleManager.FindByNameAsync(dto.RoleName);
@@ -59,6 +59,28 @@ namespace IDGFAuth.Controllers
 
             return Ok(new { Message = "Role created successfully", Role = dto.Name });
         }
+
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+        public async Task<IActionResult> GetAllRoles()
+        {
+            try
+            {
+                var roles = _roleManager.Roles.Select(r => new
+                {
+                    r.Id,
+                    r.Name
+                }).ToList();
+
+                return Ok(roles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
     }
 }
 
