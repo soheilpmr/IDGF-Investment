@@ -80,7 +80,33 @@ namespace IDGFAuth.Controllers
             }
         }
 
+        [HttpGet(nameof(GetAllClaimsOfRole))]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+        public async Task<IActionResult> GetAllClaimsOfRole(string roleName)
+        {
+            try
+            {
+                var result = new List<object>();
 
+                var role = _roleManager.Roles.Where(ss => ss.NormalizedName == roleName.ToUpper()).FirstOrDefault();
+                {
+                    var claims = await _roleManager.GetClaimsAsync(role);
+                    result.Add(new
+                    {
+                        role.Id,
+                        role.Name,
+                        Claims = claims.Select(c => new { c.Type, c.Value })
+                    });
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+
+        }
     }
 }
 
