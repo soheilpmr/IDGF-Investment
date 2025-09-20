@@ -59,6 +59,35 @@ namespace IDGFAuth.Controllers
 
             return Ok(new { Message = "User registered successfully", user.Id, user.UserName });
         }
+
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            try
+            {
+                var result = new List<object>();
+
+                foreach (var user in _userManager.Users.ToList())
+                {
+                    var roles = await _userManager.GetRolesAsync(user);
+                    result.Add(new
+                    {
+                        user.Id,
+                        user.UserName,
+                        user.Email,
+                        Roles = roles
+                    });
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }   
+        }
+
     }
 }
 public record RegisterUserDto(string UserName, string Email, string Password, string firstName, string lastName);
