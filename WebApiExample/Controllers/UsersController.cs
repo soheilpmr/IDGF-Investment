@@ -36,7 +36,7 @@ namespace IDGFAuth.Controllers
             return Ok($"Roles {string.Join(", ", rtn)} added to user '{user.UserName}'.");
         }
 
-        [HttpPost("register")]
+        [HttpPost(nameof(Register))]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         public async Task<IActionResult> Register([FromBody] RegisterUserDto dto)
         {
@@ -60,7 +60,7 @@ namespace IDGFAuth.Controllers
             return Ok(new { Message = "User registered successfully", user.Id, user.UserName });
         }
 
-        [HttpGet]
+        [HttpGet(nameof(GetAllUsers))]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         public async Task<IActionResult> GetAllUsers()
         {

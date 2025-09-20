@@ -45,7 +45,7 @@ namespace IDGFAuth.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost(nameof(CreateRole))]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         public async Task<IActionResult> CreateRole([FromBody] CreateRoleDto dto)
         {
@@ -60,7 +60,7 @@ namespace IDGFAuth.Controllers
             return Ok(new { Message = "Role created successfully", Role = dto.Name });
         }
 
-        [HttpGet]
+        [HttpGet(nameof(GetAllRoles))]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         public async Task<IActionResult> GetAllRoles()
         {

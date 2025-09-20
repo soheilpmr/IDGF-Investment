@@ -21,7 +21,7 @@ namespace IDGFAuth.Controllers
             _hostingEnvironment = configuration;
         }
 
-        [HttpPost("login")]
+        [HttpPost(nameof(Login))]
         public async Task<ActionResult<string>> Login([FromBody] LoginRequestDTO request)
         {
             if (_hostingEnvironment.IsDevelopment())
