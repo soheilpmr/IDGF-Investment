@@ -31,3 +31,11 @@
 /IDGF.ReverseProxy/IDGF.ReverseProxy.csproj.user
 /WebApiExample/IDGF-Auth.csproj.user
 /InfrastractureImplemention.slnLaunch.user
+/IDGF.Core/bin/Release/net8.0
+/WebApiExample/bin/Release/net8.0
+/WebApiExample/Properties/PublishProfiles
+/WebApiExample.DB/bin/Release/net8.0
+/Migrations.SQL/bin/Release/net8.0
+/IDGF.Core/Properties/PublishProfiles
+/BackEndInfrsastructure/bin/Release/net8.0
+/IDGF.Core/IDGF.Core.csproj.user

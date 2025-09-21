@@ -192,11 +192,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-if (app.Environment.EnvironmentName == "Docker")
-{
+//if (app.Environment.EnvironmentName == "Docker")
+//{
 	app.UseSwagger();
 	app.UseSwaggerUI();
-}
+//}
 
 app.UseHttpsRedirection();
 //app.UseMiddleware<JWTMiddleware>();
