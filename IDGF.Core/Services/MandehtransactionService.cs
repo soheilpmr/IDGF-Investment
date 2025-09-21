@@ -2,6 +2,7 @@
 using BackEndInfrastructure.Infrastructure;
 using BackEndInfrastructure.Infrastructure.Exceptions;
 using BackEndInfrastructure.Infrastructure.Service;
+using IDGF.Core.Data.Entities;
 using IDGF.Core.Domain;
 using IDGF.Core.Infrastructure.UnitOfWork;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -22,6 +23,28 @@ namespace IDGF.Core.Services
         public override Task<long> AddAsync(MandehTransactions item)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<long> AddMutipleAsync(List<MandehTransactions> items)
+        {
+            try
+            {
+                foreach (var item in items)
+                {
+                    MandehTransactionsEntity entity = new MandehTransactionsEntity(item);
+                    await _baseRepo.InsertAsync(entity);
+                    //await _coreUnitOfWork.MandehTransactionsRP.InsertAsync(entity);
+                    LogAdd(item, $"Item Added Successfully with transactionDate {item.TransactionDateTime}");
+                }
+                await _coreUnitOfWork.CommitAsync();
+                return items.Count;
+            }
+            catch (Exception ex)
+            {
+                var innerEx = new ServiceStorageException("Error adding items", ex, _serviceLogNumber);
+                LogAdd(null, "Error adding items", innerEx);
+                throw innerEx;
+            }
         }
 
         public override async Task<LinqDataResult<MandehTransactions>> ItemsAsync(LinqDataRequest request)

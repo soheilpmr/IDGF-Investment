@@ -20,28 +20,28 @@ namespace IDGF.Core.Controllers
             _logger = logger;
         }
 
-        //[Authorize]
-        [HttpGet("GetWeatherForecast")]
-        [RequirePermission("CanDeleteInvoice")]
-        public IEnumerable<WeatherForecast> Get()
-        {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
-        }
+        ////[Authorize]
+        //[HttpGet("GetWeatherForecast")]
+        //[RequirePermission("CanDeleteInvoice")]
+        //public IEnumerable<WeatherForecast> Get()
+        //{
+        //    return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        //    {
+        //        Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+        //        TemperatureC = Random.Shared.Next(-20, 55),
+        //        Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+        //    })
+        //    .ToArray();
+        //}
 
-        [HttpGet(nameof(TestApi))]
-        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
-        //[Authorize]
-        public async Task<IActionResult> TestApi()
-        {
-            _logger.LogInformation("Core Service , TestApi called");
-            return StatusCode(200, "Test Successfully");
-        }
+        //[HttpGet(nameof(TestApi))]
+        //[Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+        ////[Authorize]
+        //public async Task<IActionResult> TestApi()
+        //{
+        //    _logger.LogInformation("Core Service , TestApi called");
+        //    return StatusCode(200, "Test Successfully");
+        //}
 
     }
 }

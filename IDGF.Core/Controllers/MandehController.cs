@@ -4,6 +4,7 @@ using IDGF.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using static System.TimeZoneInfo;
 
@@ -39,6 +40,59 @@ namespace IDGF.Core.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPost(nameof(PostWithExcel))]
+        public async Task<IActionResult> PostWithExcel(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                    return BadRequest("No file uploaded.");
+
+                var transactions = new List<MandehTransactions>();
+
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream);
+                    stream.Position = 0;
+
+                    ExcelPackage.License.SetNonCommercialOrganization("My Noncommercial organization");
+
+                    using (var package = new ExcelPackage(stream))
+                    {
+                        var worksheet = package.Workbook.Worksheets[0]; // First sheet
+                        var rowCount = worksheet.Dimension.Rows;
+
+                        for (int row = 2; row <= rowCount; row++) // skip header row
+                        {
+                            var transaction = new MandehTransactions
+                            {
+                                TransactionDateTime = worksheet.Cells[row, 1].GetValue<DateTime>(),
+                                TransactionDate = DateOnly.FromDateTime(worksheet.Cells[row, 1].GetValue<DateTime>()),
+                                TransactionTime = TimeOnly.FromDateTime(worksheet.Cells[row, 1].GetValue<DateTime>()),
+                                Mablagh = worksheet.Cells[row, 2].GetValue<double>(),
+                                DarRah = worksheet.Cells[row, 3].GetValue<double>(),
+                                Taeed = worksheet.Cells[row, 4].GetValue<byte>(),
+                                Hazineh = worksheet.Cells[row, 5].GetValue<double?>()
+                            };
+                            transactions.Add(transaction);
+                        }
+                    }
+                }
+
+                var rtnCount = await _mandehtransactionService.AddMutipleAsync(transactions);
+
+                return Ok(new { Count = rtnCount, Message = "Records inserted successfully" });
+            }
+            catch (ServiceException ex)
+            {
+                return StatusCode(500, ex.ToServiceExceptionString());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
 
         [Authorize(Roles = "Admin")]
         [HttpPut]

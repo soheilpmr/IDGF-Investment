@@ -63,12 +63,10 @@ namespace BackEndInfrastructure.Infrastructure.Repository
         {
             if (item is DBModelEntity)
             {
-                return _entity.Add(item as DBModelEntity).Entity;
+                //return _entity.Add(item as DBModelEntity).Entity;
+                return (DomainModelEntity)(Model<PrimaryKeyType>)_entity.Add(item as DBModelEntity).Entity;
             }
-            else
-            {
-                return default(DomainModelEntity);
-            }
+            return null;
         }
 
         public virtual async Task UpdateAsync(DomainModelEntity item)
