@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 
 namespace IDGFAuth.Controllers
 {
@@ -81,6 +83,29 @@ namespace IDGFAuth.Controllers
                 }
 
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }   
+        }
+        
+        [HttpPost(nameof(UserLogOut))]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> UserLogOut()
+        {
+            try
+            {
+                var userId = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Unauthorized("User not found.");
+                }
+
+                await _userManager.UpdateSecurityStampAsync(user);
+
+                return Ok(new { message = "User logged out successfully. All existing tokens are now invalid." });
             }
             catch (Exception ex)
             {
