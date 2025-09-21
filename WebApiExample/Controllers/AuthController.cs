@@ -1,9 +1,12 @@
 
-using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using IDGFAuth.Data.Entities;
 using IDGFAuth.Services.JWT;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace IDGFAuth.Controllers
 {
@@ -50,6 +53,29 @@ namespace IDGFAuth.Controllers
                 return Ok(new { Token = token, Result = "Successfully Authorized" });
             }
 
+        }
+        
+        [HttpPost(nameof(LogOut))]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> LogOut()
+        {
+            try
+            {
+                var userId = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Unauthorized("User not found.");
+                }
+
+                await _userManager.UpdateSecurityStampAsync(user);
+
+                return Ok(new { message = "User logged out successfully. All existing tokens are now invalid." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
     public record LoginRequestDTO(string username, string password);

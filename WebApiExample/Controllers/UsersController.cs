@@ -90,28 +90,7 @@ namespace IDGFAuth.Controllers
             }   
         }
         
-        [HttpPost(nameof(UserLogOut))]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<IActionResult> UserLogOut()
-        {
-            try
-            {
-                var userId = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
-                var user = await _userManager.FindByIdAsync(userId);
-                if (user == null)
-                {
-                    return Unauthorized("User not found.");
-                }
-
-                await _userManager.UpdateSecurityStampAsync(user);
-
-                return Ok(new { message = "User logged out successfully. All existing tokens are now invalid." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }   
-        }
+        
 
     }
 }
