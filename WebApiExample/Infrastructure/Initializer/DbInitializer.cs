@@ -27,6 +27,10 @@ namespace IDGFAuth.Infrastructure.Initializer
             {
                 _roleManager.CreateAsync(new IdentityRole(GlobalRoles.Admin)).GetAwaiter().GetResult();
             }
+            if (_roleManager.FindByNameAsync("Nazer").Result == null)
+            {
+                _roleManager.CreateAsync(new IdentityRole("Nazer")).GetAwaiter().GetResult();
+            }
             if (_userManager.FindByNameAsync("Admin")?.Result == null)
             {
                 ApplicationUser adminUser = new ApplicationUser()
