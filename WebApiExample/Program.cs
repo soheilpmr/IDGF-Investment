@@ -55,8 +55,8 @@ static string getConnectionStringOracle()
 //    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 //}).AddJwtBearer(x =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-      .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => 
-{ 
+      .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+{
     options.MapInboundClaims = false;
     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
     {
@@ -70,6 +70,27 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ClockSkew = TimeSpan.Zero,
         RoleClaimType = JwtClaimTypes.Role
         //NameClaimType = JwtClaimTypes.Name
+    };
+    options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+    {
+        OnTokenValidated = async context =>
+        {
+            var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
+            var user = await userManager.GetUserAsync(context.Principal);
+
+            if (user == null)
+            {
+                context.Fail("Unauthorized: user not found.");
+                return;
+            }
+
+            var securityStampClaim = context.Principal.FindFirstValue("AspNet.Identity.SecurityStamp");
+
+            if (securityStampClaim == null || user.SecurityStamp != securityStampClaim)
+            {
+                context.Fail("This token has been invalidated.");
+            }
+        }
     };
 });
 #endregion
