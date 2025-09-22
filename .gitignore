@@ -39,3 +39,4 @@
 /IDGF.Core/Properties/PublishProfiles
 /BackEndInfrsastructure/bin/Release/net8.0
 /IDGF.Core/IDGF.Core.csproj.user
+/IDGF.ReverseProxy/Properties/PublishProfiles
