@@ -41,12 +41,15 @@ namespace IDGFAuth.Controllers
         }
 
         [HttpPost(nameof(LogOut))]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> LogOut()
         {
             try
             {
                 var userId = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+                if (userId == null)
+                    return Ok("You are logged out already");
+
                 var user = await _userManager.FindByIdAsync(userId);
                 if (user == null)
                 {
