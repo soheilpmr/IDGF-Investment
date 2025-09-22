@@ -26,27 +26,24 @@ namespace IDGFAuth.Services.JWT
 
         public async Task<string> GenerateToken(ApplicationUser user)
         {
-            // 1. Get roles
             var userRoles = await _userManager.GetRolesAsync(user);
+            var userClaims = new List<Claim>();
             var roleClaims = new List<Claim>();
-
+            var claimsFromUser = await _userManager.GetClaimsAsync(user);
+            userClaims.AddRange(claimsFromUser.Where(c => c.Type == "Permission"));
             foreach (var roleName in userRoles)
             {
-                // Add role as claim
                 roleClaims.Add(new Claim(JwtClaimTypes.Role, roleName));
 
-                // Add role permissions
                 var role = await _roleManager.FindByNameAsync(roleName);
                 if (role != null)
                 {
                     var claimsForRole = await _roleManager.GetClaimsAsync(role);
 
-                    // Only include Permission claims
                     roleClaims.AddRange(claimsForRole.Where(c => c.Type == "Permission"));
                 }
             }
 
-            // 2. Standard user claims
             var claims = new List<Claim>
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, user.Id),
@@ -56,14 +53,14 @@ namespace IDGFAuth.Services.JWT
                     new Claim("AspNet.Identity.SecurityStamp", user.SecurityStamp)
                 };
 
-            // 3. Combine with role claims
             claims.AddRange(roleClaims);
+            claims.AddRange(userClaims);
 
-            // 4. Signing key
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWTBearerSettings:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            // 5. Create token with issuer and audience matching middleware
+
             var token = new JwtSecurityToken(
                 issuer: _config["JWTBearerSettings:Issuer"],
                 audience: _config["JWTBearerSettings:Audience"],
