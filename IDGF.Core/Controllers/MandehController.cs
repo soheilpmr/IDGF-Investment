@@ -1,4 +1,5 @@
-﻿using BackEndInfrastructure.Infrastructure.Exceptions;
+﻿using BackEndInfrastructure.DynamicLinqCore;
+using BackEndInfrastructure.Infrastructure.Exceptions;
 using IDGF.Core.Domain;
 using IDGF.Core.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -138,9 +139,30 @@ namespace IDGF.Core.Controllers
         [Route(nameof(GetAll))]
         public async Task<ActionResult<List<MandehGetDto>>> GetAll()
         {
+
             try
             {
                 var res = await _mandehtransactionService.ItemsAsync();
+                return Ok(res);
+            }
+            catch (ServiceException ex)
+            {
+                return StatusCode(500, ex.ToServiceExceptionString());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route(nameof(GetAllMandeh))]
+        public async Task<ActionResult<LinqDataResult<MandehGetDto>>> GetAllMandeh([FromBody] LinqDataRequest request)
+        {
+            //var request = await Request.ToLinqDataHttpPostRequest();
+            try
+            {
+                var res = await _mandehtransactionService.ItemsAsync(request);
                 return Ok(res);
             }
             catch (ServiceException ex)

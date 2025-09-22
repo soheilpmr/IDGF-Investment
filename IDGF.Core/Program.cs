@@ -54,6 +54,15 @@ builder.Services.AddDbContext<CoreDbContext>();
 
 builder.Services.AddScoped<ICoreUnitOfWork, CoreUnitOfWork>();
 builder.Services.AddScoped<MandehtransactionService, MandehtransactionService>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
       .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
@@ -90,7 +99,7 @@ if (app.Environment.EnvironmentName == "Docker")
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
