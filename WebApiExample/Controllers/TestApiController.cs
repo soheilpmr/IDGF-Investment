@@ -9,13 +9,13 @@ namespace IDGFAuth.Controllers
     [Route("[controller]")]
     public class TestApiController : BaseApiController
     {
-        [HttpGet]
-        //[IDGFAuth.Services.JWT.Middleware.Authorize]
-        [Authorize]
-        [Route("Get")]
-        public async Task<IActionResult> Get()
-        {
-            return Ok("Rerurn Data Successfully");
-        }   
+        //[HttpGet]
+        ////[IDGFAuth.Services.JWT.Middleware.Authorize]
+        //[Authorize]
+        //[Route("Get")]
+        //public async Task<IActionResult> Get()
+        //{
+        //    return Ok("Rerurn Data Successfully");
+        //}   
     }
 }

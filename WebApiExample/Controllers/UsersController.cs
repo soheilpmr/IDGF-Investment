@@ -1,4 +1,7 @@
-﻿using IDGFAuth.Data.Entities;
+﻿using BackEndInfrastructure.Infrastructure.Exceptions;
+using IDGF.Auth.Models.Dtos;
+using IDGF.Auth.Services.AdminServices;
+using IDGFAuth.Data.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +16,11 @@ namespace IDGFAuth.Controllers
     public class UsersController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
-
-        public UsersController(UserManager<ApplicationUser> userManager)
+        private readonly IIdentityAdminService<IdentityRole, ApplicationUser> _identityAdminService;
+        public UsersController(UserManager<ApplicationUser> userManager, IIdentityAdminService<IdentityRole, ApplicationUser> identityAdminService)
         {
             _userManager = userManager;
+            _identityAdminService = identityAdminService;
         }
 
         [HttpPost(nameof(AddRolesToUser))]
@@ -89,8 +93,60 @@ namespace IDGFAuth.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }   
         }
-        
-        
+
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Route("ChangePasswordForMyself")]
+        public async Task<ActionResult> ChangePasswordForMyself(ChangePasswordOfMySelfDto dto)
+        {
+            var userID = User.Claims.Where(ss => ss.Type == "sub").Select(ss => ss.Value).FirstOrDefault();
+            if(userID == null)
+                return Unauthorized("User ID not found in token.");
+            if (string.IsNullOrWhiteSpace(userID))
+            {
+                return BadRequest("UserID Is Not Defined");
+            }
+            if (string.IsNullOrWhiteSpace(dto.OldPassword))
+            {
+                return BadRequest("OldPassword Not Definedn To be Change");
+            }
+            if (string.IsNullOrWhiteSpace(dto.NewPassword))
+            {
+                return BadRequest("NewPasword Not Definedn To be Change");
+            }
+            if (string.IsNullOrWhiteSpace(dto.RepeatNewPassword))
+            {
+                return BadRequest("RepeatnewPassword Not Definedn To be Change");
+            }
+            try
+            {
+                var result = await _identityAdminService.ChangePasswordForMyselfAsync(userID,
+                 dto.OldPassword, dto.NewPassword, dto.RepeatNewPassword);
+
+                return Ok("User Cahnge Password Set Successfully");
+            }
+            catch (ServiceException ex)
+            {
+                if (ex is ServiceObjectNotFoundException)
+                {
+                    return BadRequest(ex.ToServiceExceptionString());
+                }
+                else if (ex is UserException)
+                {
+                    return StatusCode(500, ex.ToServiceExceptionString());
+                }
+                else if (ex is PasswordValidateException)
+                {
+                    return StatusCode(500, ex.ToServiceExceptionString());
+                }
+                return StatusCode(500, ex.ToServiceExceptionString());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
 
     }
 }

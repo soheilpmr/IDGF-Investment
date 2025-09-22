@@ -1,3 +1,12 @@
+using IdentityModel;
+using IDGF.Auth.Services.AdminServices;
+using IDGFAuth.Data;
+using IDGFAuth.Data.Configs;
+using IDGFAuth.Data.Entities;
+using IDGFAuth.Infrastructure.Initializer;
+using IDGFAuth.Infrastructure.UnitOfWork;
+using IDGFAuth.Services;
+using IDGFAuth.Services.JWT;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,16 +18,8 @@ using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Configuration;
 using System.Reflection;
-using System.Text;
-using IDGFAuth.Data;
-using IDGFAuth.Data.Configs;
-using IDGFAuth.Data.Entities;
-using IDGFAuth.Infrastructure.Initializer;
-using IDGFAuth.Infrastructure.UnitOfWork;
-using IDGFAuth.Services;
-using IDGFAuth.Services.JWT;
-using IdentityModel;
 using System.Security.Claims;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -174,6 +175,7 @@ builder.Services.AddDbContext<IDGFAuthDbContextSQL>(options =>
 builder.Services.AddScoped<IWebApiUnitOfWorkAsync, WebApiUnitOfWorkAsync>();
 //builder.Services.AddScoped<WebServiceUserService, WebServiceUserService>();
 builder.Services.AddScoped<IJWTService, JWTService>();
+builder.Services.AddScoped(typeof(IIdentityAdminService<,>), typeof(IdentityAdminService<,>));
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 // End Infrastructure Implemention
 builder.Services.AddCors(options =>
