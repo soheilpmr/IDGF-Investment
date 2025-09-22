@@ -27,34 +27,19 @@ namespace IDGFAuth.Controllers
         [HttpPost(nameof(Login))]
         public async Task<ActionResult<string>> Login([FromBody] LoginRequestDTO request)
         {
-            if (_hostingEnvironment.IsDevelopment())
+            var user = await _userManager.FindByNameAsync(request.username);
+            if (user == null || !await _userManager.CheckPasswordAsync(user, request.password))
             {
-                var user = await _userManager.FindByNameAsync(request.username);
-                if (user == null || !await _userManager.CheckPasswordAsync(user, request.password))
-                {
-                    return Unauthorized("Invalid username or password");
-                }
+                return Unauthorized("Invalid username or password");
+            }
 
-                // Authentication successful, generate JWT
-                var token = await _jWTService.GenerateToken(user);
-                return Ok(new { Token = token, Result = "Successfully Authorized" });
-            }
-            else
-            {
-                if (request.username != "admin@gmail.com" && request.password != "Admin123*")
-                {
-                    return Unauthorized("Invalid username or password");
-                }
-                ApplicationUser applicationUser = new ApplicationUser();
-                applicationUser.UserName = request.username;
-                applicationUser.Id = "27d131eb-0da6-4d8e-a70d-8ba9d8536810";
-                // Authentication successful, generate JWT
-                var token = await _jWTService.GenerateToken(applicationUser);
-                return Ok(new { Token = token, Result = "Successfully Authorized" });
-            }
+            // Authentication successful, generate JWT
+            var token = await _jWTService.GenerateToken(user);
+            return Ok(new { Token = token, Result = "Successfully Authorized" });
+
 
         }
-        
+
         [HttpPost(nameof(LogOut))]
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> LogOut()
