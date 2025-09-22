@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using IDGFAuth.Data.Configs;
 using IDGFAuth.Data.Entities;
+using IDGF.AuthDB.Data.Entities;
 
 namespace IDGFAuth.Data
 {
@@ -25,6 +26,7 @@ namespace IDGFAuth.Data
         }
 
         public DbSet<ApplicationUser> ApplicationUsers{ get; set; }
+        public DbSet<ClaimDefinition> ClaimDefinitions { get; set; }
 
         private static string getConnectionStringSQLServer()
         {
@@ -58,6 +60,12 @@ namespace IDGFAuth.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.Entity<ClaimDefinition>().HasData(
+        new ClaimDefinition { Id = 1, Type = "Permission", Value = "CanViewInvoice", Description = "View invoices" },
+        new ClaimDefinition { Id = 2, Type = "Permission", Value = "CanCreateInvoice", Description = "Create invoices" },
+        new ClaimDefinition { Id = 3, Type = "Permission", Value = "DeleteUser", Description = "Delete invoices" },
+        new ClaimDefinition { Id = 4, Type = "Permission", Value = "RegisterUser", Description = "Manage application users" }
+    );
         }
     }
 }

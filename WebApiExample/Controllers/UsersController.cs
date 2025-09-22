@@ -1,10 +1,12 @@
-﻿using BackEndInfrastructure.Infrastructure.Exceptions;
+﻿using IDGFAuth.Data;
+using BackEndInfrastructure.Infrastructure.Exceptions;
 using IDGF.Auth.Models.Dtos;
 using IDGF.Auth.Services.AdminServices;
 using IDGFAuth.Data.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -16,10 +18,14 @@ namespace IDGFAuth.Controllers
     public class UsersController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IDGFAuthDbContextSQL _db;
         private readonly IIdentityAdminService<IdentityRole, ApplicationUser> _identityAdminService;
-        public UsersController(UserManager<ApplicationUser> userManager, IIdentityAdminService<IdentityRole, ApplicationUser> identityAdminService)
+        public UsersController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IDGFAuthDbContextSQL dbContext, IIdentityAdminService<IdentityRole, ApplicationUser> identityAdminService)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
+            _db = dbContext;
             _identityAdminService = identityAdminService;
         }
 
@@ -51,8 +57,8 @@ namespace IDGFAuth.Controllers
                 UserName = dto.UserName,
                 Email = dto.Email,
                 EmailConfirmed = false,
-                FirstName = dto.firstName,
-                LastName = dto.lastName,
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
                 AccessFailedCount = 0,
                 LockoutEnabled = false,
                 TwoFactorEnabled = false
@@ -62,6 +68,27 @@ namespace IDGFAuth.Controllers
 
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
+
+            if (!string.IsNullOrEmpty(dto.RoleName))
+            {
+                var roleExists = await _roleManager.RoleExistsAsync(dto.RoleName);
+                if (!roleExists)
+                    return NotFound($"Role '{dto.RoleName}' not found.");
+
+                await _userManager.AddToRoleAsync(user, dto.RoleName);
+            }
+
+            if (dto.ClaimIds.Any())
+            {
+                var claims = await _db.ClaimDefinitions
+                    .Where(c => dto.ClaimIds.Contains(c.Id))
+                    .ToListAsync();
+
+                foreach (var claimDef in claims)
+                {
+                    await _userManager.AddClaimAsync(user, new Claim(claimDef.Type, claimDef.Value));
+                }
+            }
 
             return Ok(new { Message = "User registered successfully", user.Id, user.UserName });
         }
@@ -150,7 +177,17 @@ namespace IDGFAuth.Controllers
 
     }
 }
-public record RegisterUserDto(string UserName, string Email, string Password, string firstName, string lastName);
+public class RegisterUserDto
+{
+    public string UserName { get; set; }
+    public string Email { get; set; }
+    public string Password { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+
+    public string RoleName { get; set; }
+    public List<int> ClaimIds { get; set; } = new();
+}
 
 public class AddRolesToUserDto
 {
