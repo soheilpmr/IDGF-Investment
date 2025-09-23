@@ -157,11 +157,11 @@ namespace IDGF.Core.Controllers
 
         [HttpPost]
         [Route(nameof(GetAllMandeh))]
-        public async Task<ActionResult<LinqDataResult<MandehGetDto>>> GetAllMandeh([FromBody] LinqDataRequest request)
+        public async Task<ActionResult<LinqDataResult<MandehGetDto>>> GetAllMandeh(/*[FromBody] LinqDataRequest request*/)
         {
-            //var request = await Request.ToLinqDataHttpPostRequest();
             try
             {
+            var request = await Request.ToLinqDataHttpPostRequest();
                 var res = await _mandehtransactionService.ItemsAsync(request);
                 return Ok(res);
             }

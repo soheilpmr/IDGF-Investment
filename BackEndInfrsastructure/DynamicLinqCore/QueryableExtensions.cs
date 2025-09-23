@@ -26,7 +26,7 @@ namespace BackEndInfrastructure.DynamicLinqCore
             if (filter != null && filter.Logic != null)
             {
                 // Filter the data first
-                queryable = Filter(queryable, filter);
+                queryable = Filter<T>(queryable, filter);
 
                 // Calculate the total number of records (needed for paging)
                 filteredCount = await queryable.CountAsync();
@@ -100,21 +100,77 @@ namespace BackEndInfrastructure.DynamicLinqCore
         }
 
 
+        //private static IQueryable<T> Filter<T>(IQueryable<T> queryable, Filter filter)
+        //{
+        //    if (filter != null && filter.Logic != null)
+        //    {
+        //        // Collect a flat list of all filters
+        //        var filters = filter.GetFlat();
+
+        //        // Get all filter values as array (needed by the Where method of Dynamic Linq)
+        //        var values = filters.Select(f => f.Value).ToArray();
+
+        //        // generate expression e.g. Field1 = @0 And Field2 > @1
+        //        string predicate = filter.ToExpression(filters);
+
+        //        // Use the Where method of Dynamic Linq to filter the data
+        //        queryable = queryable.Where(predicate, values);
+        //    }
+
+        //    return queryable;
+        //}
+
+        /// <summary>
+        /// this method added for fixing error in datagrid in react
+        /// import React from "react";
+        /// import axios from "axios";
+        /// import { DataGrid
+        /// from "@mui/x-data-grid";
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="queryable"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         private static IQueryable<T> Filter<T>(IQueryable<T> queryable, Filter filter)
         {
             if (filter != null && filter.Logic != null)
             {
-                // Collect a flat list of all filters
                 var filters = filter.GetFlat();
 
-                // Get all filter values as array (needed by the Where method of Dynamic Linq)
-                var values = filters.Select(f => f.Value).ToArray();
+                var values = new List<object>();
+                var expressions = new List<string>();
 
-                // generate expression e.g. Field1 = @0 And Field2 > @1
-                string predicate = filter.ToExpression(filters);
+                foreach (var f in filters)
+                {
+                    var fieldName = char.ToUpper(f.Field[0]) + f.Field.Substring(1);
+                    var propertyType = typeof(T).GetProperty(fieldName)?.PropertyType;
 
-                // Use the Where method of Dynamic Linq to filter the data
-                queryable = queryable.Where(predicate, values);
+                    //var propertyType = typeof(T).GetProperty(f.Field)?.PropertyType;
+                    object parsedValue = f.Value;
+
+                    if (propertyType != null)
+                    {
+                        var nonNullableType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+
+                        parsedValue = Convert.ChangeType(f.Value, nonNullableType);
+
+                        if (nonNullableType == typeof(string))
+                        {
+                            expressions.Add($"{f.Field}.Contains(@{values.Count})");
+                        }
+                        else
+                        {
+                            expressions.Add($"{f.Field} == @{values.Count}");
+                        }
+
+                        values.Add(parsedValue);
+                    }
+                }
+
+                // Combine expressions with AND/OR logic
+                string predicate = string.Join($" {filter.Logic} ", expressions);
+
+                queryable = queryable.Where(predicate, values.ToArray());
             }
 
             return queryable;

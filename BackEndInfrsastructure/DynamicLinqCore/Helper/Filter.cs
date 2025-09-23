@@ -75,7 +75,7 @@ namespace BackEndInfrastructure.DynamicLinqCore.Helper
                 foreach (Filter filter in Filters)
                 {
                     filters.Add(filter);
-                    filter.Flatten(filters);
+                    //filter.Flatten(filters);
                 }
             }
             else
