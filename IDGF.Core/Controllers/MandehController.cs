@@ -1,4 +1,5 @@
-﻿using BackEndInfrastructure.DynamicLinqCore;
+﻿using Azure.Core;
+using BackEndInfrastructure.DynamicLinqCore;
 using BackEndInfrastructure.Infrastructure.Exceptions;
 using IDGF.Core.Domain;
 using IDGF.Core.Services;
@@ -157,14 +158,20 @@ namespace IDGF.Core.Controllers
 
         [HttpPost]
         [Route(nameof(GetAllMandeh))]
-        public async Task<ActionResult<LinqDataResult<MandehGetDto>>> GetAllMandeh(/*[FromBody] LinqDataRequest request*/)
+        public async Task<ActionResult<LinqDataResult<MandehGetDto>>> GetAllMandeh([FromBody] LinqDataRequest? linqDataRequest)
         {
             try
             {
-            var request = await Request.ToLinqDataHttpPostRequest();
-                var res = await _mandehtransactionService.ItemsAsync(request);
-                return Ok(res);
-            }
+                if(linqDataRequest == null)
+                {
+					var request = await Request.ToLinqDataHttpPostRequest();
+					var res1 = await _mandehtransactionService.ItemsAsync(request);
+					return Ok(res1);
+				}
+				var res2 = await _mandehtransactionService.ItemsAsync(linqDataRequest);
+				return Ok(res2);
+
+			}
             catch (ServiceException ex)
             {
                 return StatusCode(500, ex.ToServiceExceptionString());
@@ -174,7 +181,9 @@ namespace IDGF.Core.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-    }
+
+		
+	}
 
     public class MandehPutDto
     {
