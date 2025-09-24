@@ -1,6 +1,7 @@
 ﻿using BackEndInfrastructure.DynamicLinqCore.Helper;
 using BackEndInfrastructure.DynamicLinqCore.ToLinqDataHttpPostRequestBaseClasses;
 using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -84,6 +85,16 @@ namespace BackEndInfrastructure.DynamicLinqCore
         public static async Task<LinqDataRequest> ToLinqDataHttpPostRequest(this HttpRequest request)
         {
             string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+            if(requestBody.IsNullOrEmpty())
+            {
+                return new LinqDataRequest
+                {
+                    Skip = 0,
+                    Take = 10,
+                    Filter = null,
+                    Sort = null
+                };
+            }
 
             var searchvalue = Function.GetSearchValue(requestBody);
             string text = searchvalue.Item1.ToString();// draw

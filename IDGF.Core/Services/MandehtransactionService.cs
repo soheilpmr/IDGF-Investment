@@ -51,7 +51,8 @@ namespace IDGF.Core.Services
         {
             try
             {
-                var f = await _baseRepo.AllItemsAsync(request);
+                //var f = await _baseRepo.AllItemsAsync(request);
+                var f = await _coreUnitOfWork.MandehTransactionsRP.AllItemsAsync(request);
                 LogRetrieveMultiple(null, request);
                 return f;
             }
