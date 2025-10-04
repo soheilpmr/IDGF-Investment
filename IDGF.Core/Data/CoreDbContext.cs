@@ -1,5 +1,6 @@
 ﻿using IDGF.Core.Data.Configurations;
 using IDGF.Core.Data.Entities;
+using IDGF.Core.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace IDGF.Core.Data
@@ -18,10 +19,15 @@ namespace IDGF.Core.Data
             //_configuration = configuration;
         }
         public DbSet<MandehTransactionsEntity> MndehTransactions { get; set; }
+        public DbSet<BondsTypeEntity> BondTypes { get; set; }
+        public DbSet<BondsEntity> Bonds { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfiguration(new MandehConfiguration());
+            modelBuilder.ApplyConfiguration(new BondTypesConfiguration());
+            modelBuilder.ApplyConfiguration(new BondsConfiguration());
+
         }
 
         private static string getConnectionString()

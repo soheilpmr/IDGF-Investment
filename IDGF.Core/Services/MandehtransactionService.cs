@@ -59,7 +59,7 @@ namespace IDGF.Core.Services
             catch (Exception ex)
             {
                 LogRetrieveMultiple(null, request, ex);
-                throw new ServiceStorageException("Error retrieving the company list ", ex, _serviceLogNumber);
+                throw new ServiceStorageException("Error retrieving the Mandeh list ", ex, _serviceLogNumber);
             }
         }
 

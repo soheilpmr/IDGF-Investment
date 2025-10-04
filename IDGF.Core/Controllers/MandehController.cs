@@ -25,7 +25,7 @@ namespace IDGF.Core.Controllers
         [Authorize(Roles = "Admin")]
         [HttpDelete]
         [Route("Delete")]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace IDGF.Core.Controllers
         [Authorize(Roles = "Admin")]
         [HttpPut]
         [Route("Put")]
-        public async Task<ActionResult> Put(MandehPutDto mandeh)
+        public async Task<IActionResult> Put(MandehPutDto mandeh)
         {
             var dbLoadedObject = await _mandehtransactionService.RetrieveByIdAsync(mandeh.ID);
             if (dbLoadedObject == null)
@@ -158,20 +158,14 @@ namespace IDGF.Core.Controllers
 
         [HttpPost]
         [Route(nameof(GetAllMandeh))]
-        public async Task<ActionResult<LinqDataResult<MandehGetDto>>> GetAllMandeh([FromBody] LinqDataRequest? linqDataRequest)
+        public async Task<ActionResult<LinqDataResult<MandehGetDto>>> GetAllMandeh()
         {
             try
             {
-                if(linqDataRequest == null)
-                {
-					var request = await Request.ToLinqDataHttpPostRequest();
-					var res1 = await _mandehtransactionService.ItemsAsync(request);
-					return Ok(res1);
-				}
-				var res2 = await _mandehtransactionService.ItemsAsync(linqDataRequest);
-				return Ok(res2);
-
-			}
+                var request = await Request.ToLinqDataHttpPostRequest();
+                var res1 = await _mandehtransactionService.ItemsAsync(request);
+                return Ok(res1);
+            }
             catch (ServiceException ex)
             {
                 return StatusCode(500, ex.ToServiceExceptionString());
@@ -182,8 +176,25 @@ namespace IDGF.Core.Controllers
             }
         }
 
-		
-	}
+        [HttpPost]
+        [Route(nameof(GetAllMandehWithBodyRequest))]
+        public async Task<ActionResult<LinqDataResult<MandehGetDto>>> GetAllMandehWithBodyRequest([FromBody] LinqDataRequest? linqDataRequest)
+        {
+            try
+            {
+                var res2 = await _mandehtransactionService.ItemsAsync(linqDataRequest);
+                return Ok(res2);
+            }
+            catch (ServiceException ex)
+            {
+                return StatusCode(500, ex.ToServiceExceptionString());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+    }
 
     public class MandehPutDto
     {

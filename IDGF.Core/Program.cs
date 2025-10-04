@@ -4,9 +4,11 @@ using IDGF.Core.Infrastructure.UnitOfWork;
 using IDGF.Core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,9 +53,13 @@ builder.Services.AddSwaggerGen(
     });
 
 builder.Services.AddDbContext<CoreDbContext>();
+// Current
+builder.Services.AddAutoMapper(cfg => cfg.LicenseKey = "<License Key Here>", typeof(Program));
 
 builder.Services.AddScoped<ICoreUnitOfWork, CoreUnitOfWork>();
 builder.Services.AddScoped<MandehtransactionService, MandehtransactionService>();
+builder.Services.AddScoped<BondsService, BondsService>();
+builder.Services.AddScoped<BondsTypeService, BondsTypeService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>

@@ -3,8 +3,9 @@ using BackEndInfrastructure.Infrastructure;
 using IDGF.Core.Data;
 using IDGF.Core.Data.Entities;
 using IDGF.Core.Domain;
+using IDGF.Core.Infrastructure.Repositories.Interface;
 
-namespace IDGF.Core.Infrastructure.Repositories
+namespace IDGF.Core.Infrastructure.Repositories.Implemention
 {
     public class MandehTransactionsRepositories : LDRCompatibleRepositoryAsync<MandehTransactionsEntity, MandehTransactions, long>, IMandehTransactionsRepositories
     {

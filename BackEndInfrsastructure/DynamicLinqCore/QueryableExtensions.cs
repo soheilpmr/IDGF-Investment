@@ -142,6 +142,10 @@ namespace BackEndInfrastructure.DynamicLinqCore
 
                 foreach (var f in filters)
                 {
+                    if(f.Field == "id")
+                    {
+                        f.Field = "ID";
+                    }
                     var fieldName = char.ToUpper(f.Field[0]) + f.Field.Substring(1);
                     var propertyType = typeof(T).GetProperty(fieldName)?.PropertyType;
 
