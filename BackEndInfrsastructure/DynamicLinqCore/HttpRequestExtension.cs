@@ -85,7 +85,18 @@ namespace BackEndInfrastructure.DynamicLinqCore
         public static async Task<LinqDataRequest> ToLinqDataHttpPostRequest(this HttpRequest request)
         {
             string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-            if(requestBody.IsNullOrEmpty())
+            //if(requestBody.IsNullOrEmpty())
+            //{
+            //    return new LinqDataRequest
+            //    {
+            //        Skip = 0,
+            //        Take = 10,
+            //        Filter = null,
+            //        Sort = null
+            //    };
+            //}
+
+            if (string.IsNullOrEmpty(requestBody))
             {
                 return new LinqDataRequest
                 {

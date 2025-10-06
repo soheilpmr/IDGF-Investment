@@ -29,6 +29,22 @@ namespace IDGF.Core.Services
             throw new NotImplementedException();
         }
 
+        public async Task<List<BondsGetDto>> GetAllWithType(int typeID)
+        {
+            try
+            {
+                //var f = await _baseRepo.AllItemsAsync(request);
+                var result = await _coreUnitOfWork.BondsRP.GetAllWithType(typeID);
+                LogRetrieveMultiple();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                LogRetrieveMultiple(null, null, ex);
+                throw new ServiceStorageException($"Error retrieving the GetAllBonds list with Type : {typeID}", ex, _serviceLogNumber);
+            }
+        }
+
         public async Task<LinqDataResult<BondsGetDto>> AllIslamicTreasuryItemsAsync(LinqDataRequest request)
         {
             try

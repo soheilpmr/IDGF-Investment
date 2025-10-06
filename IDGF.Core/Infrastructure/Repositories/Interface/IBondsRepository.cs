@@ -11,5 +11,8 @@ namespace IDGF.Core.Infrastructure.Repositories.Interface
         Task<LinqDataResult<Bonds>> AllGovernmentBondItemsAsync(LinqDataRequest request);
         Task<LinqDataResult<Bonds>> AllMurabahaBondItemsAsync(LinqDataRequest request);
         Task<LinqDataResult<Bonds>> AllPartnershipBondItemsAsync(LinqDataRequest request);
+
+        Task<List<BondsGetDto>> GetAllWithType(int typeID);
+
     }
 }

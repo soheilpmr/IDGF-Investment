@@ -23,6 +23,26 @@ namespace IDGF.Core.Controllers
 
 
         [HttpPost]
+        [Route(nameof(GetAllWithType))]
+        public async Task<ActionResult<List<BondsGetDto>>> GetAllWithType(int typeID)
+        {
+            try
+            {
+                var res1 = await _bondsService.GetAllWithType(typeID);
+                return Ok(res1);
+            }
+            catch (ServiceException ex)
+            {
+                return StatusCode(500, ex.ToServiceExceptionString());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+
+        [HttpPost]
         [Route(nameof(GetAllIslamicTreasury))]
         public async Task<ActionResult<LinqDataResult<BondsGetDto>>> GetAllIslamicTreasury()
         {

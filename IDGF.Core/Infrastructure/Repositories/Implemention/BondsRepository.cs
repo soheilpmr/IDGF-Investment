@@ -1,10 +1,12 @@
-﻿using BackEndInfrastructure.DynamicLinqCore;
+﻿using Azure.Core;
+using BackEndInfrastructure.DynamicLinqCore;
 using BackEndInfrastructure.Infrastructure;
 using IDGF.Core.Controllers.Dtos;
 using IDGF.Core.Data;
 using IDGF.Core.Data.Entities;
 using IDGF.Core.Domain;
 using IDGF.Core.Infrastructure.Repositories.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace IDGF.Core.Infrastructure.Repositories.Implemention
 {
@@ -81,6 +83,20 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
                 .Where(ss => ss.TypeID == ((int)BondTypesEnum.PartnershipBond))
                 .OrderByDescending(ss => ss.MaturityDate)
                 .ToLinqDataResultAsync<Bonds>(request.Take, request.Skip, request.Sort, request.Filter);
+        }
+
+        public async Task<List<BondsGetDto>> GetAllWithType(int typeID)
+        {
+            return await _context.Bonds
+               .Where(ss => ss.TypeID == typeID)
+                   .Select(ss => new BondsGetDto
+                   {
+                       Symbol = ss.Symbol,
+                       MaturityDate = ss.MaturityDate,
+                       FaceValue = ss.FaceValue
+                   })
+               .OrderByDescending(ss => ss.MaturityDate)
+               .ToListAsync<BondsGetDto>();
         }
     }
 }
