@@ -1,11 +1,18 @@
 ﻿using BackEndInfrastructure.DynamicLinqCore;
 using BackEndInfrastructure.Infrastructure.Service;
 using IDGF.Core.Domain;
+using IDGF.Core.Infrastructure.UnitOfWork;
 
 namespace IDGF.Core.Services
 {
     public class BrokerageService : StorageBusinessService<Brokerage, int>
     {
+        private readonly ICoreUnitOfWork _coreUnitOfWork;
+        private const int _serviceLogNumber = 400;
+        public BrokerageService(ILogger<Brokerage> logger, ICoreUnitOfWork coreUnitOfWork):base(logger, _serviceLogNumber)
+        {
+            _coreUnitOfWork = coreUnitOfWork;
+        }
         public override Task<int> AddAsync(Brokerage item)
         {
             throw new NotImplementedException();
