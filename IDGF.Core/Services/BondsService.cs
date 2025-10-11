@@ -1,4 +1,5 @@
-﻿using BackEndInfrastructure.DynamicLinqCore;
+﻿using Azure.Core;
+using BackEndInfrastructure.DynamicLinqCore;
 using BackEndInfrastructure.Infrastructure;
 using BackEndInfrastructure.Infrastructure.Exceptions;
 using BackEndInfrastructure.Infrastructure.Service;
@@ -44,6 +45,23 @@ namespace IDGF.Core.Services
                 throw new ServiceStorageException($"Error retrieving the GetAllBonds list with Type : {typeID}", ex, _serviceLogNumber);
             }
         }
+
+        public async Task<LinqDataResult<BondsGetDto>> GetAllWithTypeWithPagination(LinqDataRequest linqDataRequest, int typeID)
+        {
+            try
+            {
+                //var f = await _baseRepo.AllItemsAsync(request);
+                var result = await _coreUnitOfWork.BondsRP.GetAllWithTypeWithPagination(linqDataRequest, typeID);
+                LogRetrieveMultiple(null, linqDataRequest);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                LogRetrieveMultiple(null, linqDataRequest, ex);
+                throw new ServiceStorageException($"Error retrieving the GetAllBonds list with Type With Pagination Mode : {typeID}", ex, _serviceLogNumber);
+            }
+        }
+
 
         public async Task<LinqDataResult<BondsGetDto>> AllIslamicTreasuryItemsAsync(LinqDataRequest request)
         {

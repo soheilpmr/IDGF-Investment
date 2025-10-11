@@ -98,5 +98,19 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
                .OrderByDescending(ss => ss.MaturityDate)
                .ToListAsync<BondsGetDto>();
         }
+
+        public async Task<LinqDataResult<BondsGetDto>> GetAllWithTypeWithPagination(LinqDataRequest request, int typeID)
+        {
+            return await _context.Bonds
+               .Where(ss => ss.TypeID == typeID)
+                   .Select(ss => new BondsGetDto
+                   {
+                       Symbol = ss.Symbol,
+                       MaturityDate = ss.MaturityDate,
+                       FaceValue = ss.FaceValue
+                   })
+               .OrderByDescending(ss => ss.MaturityDate)
+            .ToLinqDataResultAsync<BondsGetDto>(request.Take, request.Skip, request.Sort, request.Filter);
+        }
     }
 }
