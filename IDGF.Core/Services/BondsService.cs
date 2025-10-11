@@ -30,7 +30,7 @@ namespace IDGF.Core.Services
             throw new NotImplementedException();
         }
 
-        public async Task<List<BondsGetDto>> GetAllWithType(int typeID)
+        public async Task<List<BondsGetDto>> GetAllWithType(int? typeID)
         {
             try
             {
@@ -46,7 +46,7 @@ namespace IDGF.Core.Services
             }
         }
 
-        public async Task<LinqDataResult<BondsGetDto>> GetAllWithTypeWithPagination(LinqDataRequest linqDataRequest, int typeID)
+        public async Task<LinqDataResult<BondsGetDto>> GetAllWithTypeWithPagination(LinqDataRequest linqDataRequest, int? typeID)
         {
             try
             {

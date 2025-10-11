@@ -12,8 +12,8 @@ namespace IDGF.Core.Infrastructure.Repositories.Interface
         Task<LinqDataResult<Bonds>> AllMurabahaBondItemsAsync(LinqDataRequest request);
         Task<LinqDataResult<Bonds>> AllPartnershipBondItemsAsync(LinqDataRequest request);
 
-        Task<List<BondsGetDto>> GetAllWithType(int typeID);
-        Task<LinqDataResult<BondsGetDto>> GetAllWithTypeWithPagination(LinqDataRequest request, int typeID);
+        Task<List<BondsGetDto>> GetAllWithType(int? typeID);
+        Task<LinqDataResult<BondsGetDto>> GetAllWithTypeWithPagination(LinqDataRequest request, int? typeID);
 
     }
 }

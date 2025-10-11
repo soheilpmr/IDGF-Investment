@@ -12,7 +12,7 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
 {
     public class BondsRepository : LDRCompatibleRepositoryAsync<BondsEntity, Bonds, decimal>, IBondsRepository
     {
-        private readonly CoreDbContext _context;    
+        private readonly CoreDbContext _context;
         public BondsRepository(CoreDbContext coreDbContext) : base(coreDbContext)
         {
             _context = coreDbContext;
@@ -47,7 +47,7 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
                 .OrderByDescending(ss => ss.MaturityDate)
                .ToLinqDataResultAsync<Bonds>(request.Take, request.Skip, request.Sort, request.Filter);
         }
-        
+
         /// <summary>
         /// اوراق اجاره دولت
         /// </summary>
@@ -85,9 +85,23 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
                 .ToLinqDataResultAsync<Bonds>(request.Take, request.Skip, request.Sort, request.Filter);
         }
 
-        public async Task<List<BondsGetDto>> GetAllWithType(int typeID)
+        public async Task<List<BondsGetDto>> GetAllWithType(int? typeID)
         {
-            return await _context.Bonds
+            if (typeID is null)
+            {
+                return await _context.Bonds
+                    .Select(ss => new BondsGetDto
+                    {
+                        Symbol = ss.Symbol,
+                        MaturityDate = ss.MaturityDate,
+                        FaceValue = ss.FaceValue
+                    })
+                .OrderByDescending(ss => ss.MaturityDate)
+                .ToListAsync<BondsGetDto>();
+            }
+            else
+            {
+                return await _context.Bonds
                .Where(ss => ss.TypeID == typeID)
                    .Select(ss => new BondsGetDto
                    {
@@ -97,12 +111,14 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
                    })
                .OrderByDescending(ss => ss.MaturityDate)
                .ToListAsync<BondsGetDto>();
+            }
         }
 
-        public async Task<LinqDataResult<BondsGetDto>> GetAllWithTypeWithPagination(LinqDataRequest request, int typeID)
+        public async Task<LinqDataResult<BondsGetDto>> GetAllWithTypeWithPagination(LinqDataRequest request, int? typeID)
         {
-            return await _context.Bonds
-               .Where(ss => ss.TypeID == typeID)
+            if (typeID is null)
+            {
+                return await _context.Bonds
                    .Select(ss => new BondsGetDto
                    {
                        Symbol = ss.Symbol,
@@ -110,7 +126,22 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
                        FaceValue = ss.FaceValue
                    })
                .OrderByDescending(ss => ss.MaturityDate)
-            .ToLinqDataResultAsync<BondsGetDto>(request.Take, request.Skip, request.Sort, request.Filter);
+               .ToLinqDataResultAsync<BondsGetDto>(request.Take, request.Skip, request.Sort, request.Filter);
+            }
+            else
+            {
+                return await _context.Bonds
+              .Where(ss => ss.TypeID == typeID)
+                 .Select(ss => new BondsGetDto
+                 {
+                     Symbol = ss.Symbol,
+                     MaturityDate = ss.MaturityDate,
+                     FaceValue = ss.FaceValue
+                 })
+              .OrderByDescending(ss => ss.MaturityDate)
+              .ToLinqDataResultAsync<BondsGetDto>(request.Take, request.Skip, request.Sort, request.Filter);
+            }
+
         }
     }
 }

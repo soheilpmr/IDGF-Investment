@@ -137,8 +137,8 @@ namespace IDGF.Core.Controllers
 
 
         [HttpGet]
-        [Route(nameof(GetAll))]
-        public async Task<ActionResult<List<MandehGetDto>>> GetAll()
+        [Route(nameof(GetAllMandeh))]
+        public async Task<ActionResult<List<MandehGetDto>>> GetAllMandeh()
         {
 
             try
@@ -157,8 +157,8 @@ namespace IDGF.Core.Controllers
         }
 
         [HttpPost]
-        [Route(nameof(GetAllMandeh))]
-        public async Task<ActionResult<LinqDataResult<MandehGetDto>>> GetAllMandeh()
+        [Route(nameof(GetAllMandehWithPagination))]
+        public async Task<ActionResult<LinqDataResult<MandehGetDto>>> GetAllMandehWithPagination()
         {
             try
             {

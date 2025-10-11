@@ -29,7 +29,7 @@ namespace IDGF.Core.Controllers
         [HttpPost]
         [Route(nameof(GetAllWithType))]
         
-        public async Task<ActionResult<List<BondsGetDto>>> GetAllWithType(int typeID)
+        public async Task<ActionResult<List<BondsGetDto>>> GetAllWithType(int? typeID)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace IDGF.Core.Controllers
         [HttpPost]
         [Route(nameof(GetAllWithTypeWithPagination))]
        
-        public async Task<ActionResult<LinqDataResult<BondsGetDto>>> GetAllWithTypeWithPagination([FromQuery] int typeID)
+        public async Task<ActionResult<LinqDataResult<BondsGetDto>>> GetAllWithTypeWithPagination([FromQuery] int? typeID)
         {
             try
             {
