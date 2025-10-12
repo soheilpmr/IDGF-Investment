@@ -23,5 +23,7 @@ namespace IDGF.Core.Data.Entities
 
         [ForeignKey(nameof(TypeID))]
         public virtual BondsTypeEntity? BondTypesEntity { get; set; }
+
+        public ICollection<TransactionsEntity>? TransactionsEntities { get; set; }
     }
 }

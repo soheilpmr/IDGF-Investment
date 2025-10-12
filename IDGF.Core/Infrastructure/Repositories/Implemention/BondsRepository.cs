@@ -5,6 +5,7 @@ using IDGF.Core.Controllers.Dtos;
 using IDGF.Core.Data;
 using IDGF.Core.Data.Entities;
 using IDGF.Core.Domain;
+using IDGF.Core.Domain.Enums;
 using IDGF.Core.Infrastructure.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
 
