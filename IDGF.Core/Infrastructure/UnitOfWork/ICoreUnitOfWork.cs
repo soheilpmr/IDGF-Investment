@@ -10,5 +10,6 @@ namespace IDGF.Core.Infrastructure.UnitOfWork
         IBondsRepository BondsRP { get; }
         IBondsTypeRepository BondsTypeRP { get; }
         IBrokerageRepository BrokerageRP { get; }
+        ITransactionsRepository TransactionRP { get; }
     }
 }

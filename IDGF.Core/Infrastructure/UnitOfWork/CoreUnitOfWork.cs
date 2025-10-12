@@ -18,12 +18,14 @@ namespace IDGF.Core.Infrastructure.UnitOfWork
             BondsRP = new BondsRepository(base._dbContext);
             BondsTypeRP = new BondsTypeRepository(base._dbContext);
             BrokerageRP = new BrokerageRepository(base._dbContext);
+            TransactionRP = new TransactionsRepository(base._dbContext);
         }
 
         public IMandehTransactionsRepositories MandehTransactionsRP { get; private set; }
         public IBondsRepository BondsRP { get; private set; }
         public IBondsTypeRepository BondsTypeRP { get; private set; }
         public IBrokerageRepository BrokerageRP { get; private set; }
+        public ITransactionsRepository TransactionRP { get; private set; }
 
         public ILDRCompatibleRepositoryAsync<T, PrimKey> GetRepo<T, PrimKey>()
             where T : Model<PrimKey>
@@ -47,6 +49,11 @@ namespace IDGF.Core.Infrastructure.UnitOfWork
 
             }
             if (typeof(T) == typeof(Brokerage))
+            {
+                ff = BrokerageRP as ILDRCompatibleRepositoryAsync<T, PrimKey>;
+
+            }
+            if (typeof(T) == typeof(Transaction))
             {
                 ff = BrokerageRP as ILDRCompatibleRepositoryAsync<T, PrimKey>;
 

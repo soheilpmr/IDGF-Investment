@@ -7,7 +7,7 @@ namespace IDGF.Core.Data.Views
 
     [Keyless]
     [NotMapped]
-    public class TransactionBasicEntity : TransactionBasic
+    public class TransactionBasicViewEntity : TransactionBasicView
     {
     }
 }

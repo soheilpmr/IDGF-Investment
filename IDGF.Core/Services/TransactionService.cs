@@ -1,6 +1,11 @@
-﻿using BackEndInfrastructure.DynamicLinqCore;
+﻿using AutoMapper;
+using Azure.Core;
+using BackEndInfrastructure.DynamicLinqCore;
+using BackEndInfrastructure.Infrastructure.Exceptions;
 using BackEndInfrastructure.Infrastructure.Service;
 using IDGF.Core.Domain;
+using IDGF.Core.Domain.Views;
+using IDGF.Core.Infrastructure;
 using IDGF.Core.Infrastructure.UnitOfWork;
 
 namespace IDGF.Core.Services
@@ -8,11 +13,13 @@ namespace IDGF.Core.Services
     public class TransactionService : StorageBusinessService<Transactions, decimal>
     {
         private readonly ICoreUnitOfWork _coreUnitOfWork;
-        private const int _serviceLogNumber = 500;
+        private const int _serviceLogNumber = 600;
+        private readonly IMapper _mapper;
 
-        public TransactionService(ILogger<Transactions> logger, ICoreUnitOfWork coreUnitOfWork) : base(logger, _serviceLogNumber)   
+        public TransactionService(ILogger<Transactions> logger, ICoreUnitOfWork coreUnitOfWork, IMapper mapper) : base(logger, _serviceLogNumber)
         {
             _coreUnitOfWork = coreUnitOfWork;
+            _mapper = mapper;
         }
 
         public override Task<decimal> AddAsync(Transactions item)
@@ -38,6 +45,33 @@ namespace IDGF.Core.Services
         public override Task<Transactions> RetrieveByIdAsync(decimal ID)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<LinqDataResult<TransactionResult>> GetAllTransactionViewService(LinqDataRequest linqDataRequest, int? bondId = null,
+        string? brokerName = null,
+        DateOnly? transactionDateFrom = null,
+        DateOnly? transactionDateTo = null)
+        {
+            try
+            {
+                var rtnView = await _coreUnitOfWork.TransactionRP.GetAllItemsView(linqDataRequest, bondId, brokerName, transactionDateFrom, transactionDateTo);
+
+                var mappedData = _mapper.Map<IEnumerable<TransactionResult>>(rtnView.Data);
+
+                LinqDataResult<TransactionResult> linqDataResult = new LinqDataResult<TransactionResult>
+                {
+                    Data = mappedData,
+                    RecordsTotal = rtnView.RecordsTotal,
+                    RecordsFiltered = rtnView.RecordsFiltered   
+                };
+
+                return linqDataResult;
+            }
+            catch (Exception ex)
+            {
+                LogRetrieveMultiple(null, linqDataRequest, ex);
+                throw new ServiceStorageException("Error retrieving the TransactionView list ", ex, _serviceLogNumber);
+            }
         }
 
         protected override Task ValidateOnAddAsync(Transactions item)

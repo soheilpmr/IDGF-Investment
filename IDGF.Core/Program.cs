@@ -61,6 +61,7 @@ builder.Services.AddScoped<MandehtransactionService, MandehtransactionService>()
 builder.Services.AddScoped<BondsService, BondsService>();
 builder.Services.AddScoped<BondsTypeService, BondsTypeService>();
 builder.Services.AddScoped<BrokerageService, BrokerageService>();
+builder.Services.AddScoped<TransactionService, TransactionService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>

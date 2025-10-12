@@ -1,5 +1,6 @@
 ﻿using IDGF.Core.Data.Configurations;
 using IDGF.Core.Data.Entities;
+using IDGF.Core.Data.Views;
 using IDGF.Core.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +23,10 @@ namespace IDGF.Core.Data
         public DbSet<BondsTypeEntity> BondTypes { get; set; }
         public DbSet<BondsEntity> Bonds { get; set; }
         public DbSet<BrokerageEntity> Brokerages { get; set; }
+
+        #region Query-Sets
+        public DbSet<TransactionBasicViewEntity> TransactionBasicViews { get; set; }
+        #endregion  
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -29,7 +34,9 @@ namespace IDGF.Core.Data
             modelBuilder.ApplyConfiguration(new BondTypesConfiguration());
             modelBuilder.ApplyConfiguration(new BondsConfiguration());
             modelBuilder.ApplyConfiguration(new BrokerageConfiguration());
+            modelBuilder.ApplyConfiguration(new TransactionsConfiguration());
 
+            modelBuilder.Entity<TransactionBasicViewEntity>().ToView("vw_TransactionBasic");
         }
 
         private static string getConnectionString()
