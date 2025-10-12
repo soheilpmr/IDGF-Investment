@@ -21,12 +21,14 @@ namespace IDGF.Core.Data
         public DbSet<MandehTransactionsEntity> MndehTransactions { get; set; }
         public DbSet<BondsTypeEntity> BondTypes { get; set; }
         public DbSet<BondsEntity> Bonds { get; set; }
+        public DbSet<BrokerageEntity> Brokerages { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfiguration(new MandehConfiguration());
             modelBuilder.ApplyConfiguration(new BondTypesConfiguration());
             modelBuilder.ApplyConfiguration(new BondsConfiguration());
+            modelBuilder.ApplyConfiguration(new BrokerageConfiguration());
 
         }
 
