@@ -101,7 +101,7 @@ namespace BackEndInfrastructure.DynamicLinqCore
                 return new LinqDataRequest
                 {
                     Skip = 0,
-                    Take = 30,
+                    Take = 100,
                     Filter = null,
                     Sort = null
                 };

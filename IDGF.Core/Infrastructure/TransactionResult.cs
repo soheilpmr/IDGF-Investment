@@ -16,7 +16,6 @@
         public short Status { get; set; }
         public string TransactionType { get; set; }
 
-        // 🧮 Derived fields (computed in C#)
 
         public decimal InvestmentAmount => PricePerUnit * Quantity;//[مبلغ سرمایه‌گذاری‌شده],
         public decimal MaturityAmount => FaceValue * Quantity;// [مبلغ در سررسید],
@@ -34,7 +33,7 @@
             }
         }
 
-        // Yield to Maturity (%)
+        //Yield to Maturity(%)
         public decimal YieldToMaturity// [بازدهی تا سررسید (YTM %)],
         {
             get
@@ -45,6 +44,19 @@
                 return Math.Round(ytm, 2);
             }
         }
+
+        public decimal YieldToMaturityV2// [بازدهی تا سررسید (YTM %) نسخه ۲],
+        {
+            get
+            {
+                if (PricePerUnit <= 0 || DaysToMaturity <= 0)
+                    return 0;
+
+                var ytm = Math.Abs((((FaceValue / PricePerUnit) * (365m / DaysToMaturity)) - 1) * 100m);
+                return Math.Round(ytm, 2);
+            }
+        }
+
 
         // Total Purchase Amount (with commission)
         public decimal TotalPurchase => (PricePerUnit * Quantity) + Commission;
