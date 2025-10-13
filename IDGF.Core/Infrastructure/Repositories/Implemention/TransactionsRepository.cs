@@ -46,7 +46,7 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
                 query = query.Where(t => t.TransactionDate >= transactionDateFrom.Value);
 
             if (transactionDateTo.HasValue)
-                query = query.Where(t => t.TransactionDate >= transactionDateTo.Value);
+                query = query.Where(t => t.TransactionDate <= transactionDateTo.Value);
             // ✅ Apply pagination, sorting, and filtering from your LINQ request
             var result = await query.ToLinqDataResultAsync<TransactionBasicView>(
                 request.Take, request.Skip, request.Sort, request.Filter);

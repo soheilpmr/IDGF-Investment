@@ -157,8 +157,8 @@ namespace IDGF.Core.Controllers
         }
 
         [HttpPost]
-        [Route(nameof(GetAllMandehWithPagination))]
-        public async Task<ActionResult<LinqDataResult<MandehGetDto>>> GetAllMandehWithPagination()
+        [Route(nameof(GetAllMandehPagination))]
+        public async Task<ActionResult<LinqDataResult<MandehGetDto>>> GetAllMandehPagination()
         {
             try
             {

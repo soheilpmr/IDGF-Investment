@@ -18,12 +18,12 @@
 
         // 🧮 Derived fields (computed in C#)
 
-        public decimal InvestmentAmount => PricePerUnit * Quantity;
-        public decimal MaturityAmount => FaceValue * Quantity;
-        public int DaysToMaturity => (MaturityDate.ToDateTime(TimeOnly.MinValue) - TransactionDate.ToDateTime(TimeOnly.MinValue)).Days;
+        public decimal InvestmentAmount => PricePerUnit * Quantity;//[مبلغ سرمایه‌گذاری‌شده],
+        public decimal MaturityAmount => FaceValue * Quantity;// [مبلغ در سررسید],
+        public int DaysToMaturity => (MaturityDate.ToDateTime(TimeOnly.MinValue) - TransactionDate.ToDateTime(TimeOnly.MinValue)).Days;// [تعداد روزهای تقویمی],
 
         // Simple Yield (%)
-        public decimal SimpleYield
+        public decimal SimpleYield//[بازده ساده (%)],
         {
             get
             {
@@ -35,7 +35,7 @@
         }
 
         // Yield to Maturity (%)
-        public decimal YieldToMaturity
+        public decimal YieldToMaturity// [بازدهی تا سررسید (YTM %)],
         {
             get
             {
