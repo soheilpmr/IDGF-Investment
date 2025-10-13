@@ -105,7 +105,7 @@ namespace IDGF.Core.Services
                 LogRemove(ID, "Brokerage With This Id Not Found", f);
                 throw f;
             }
-            await _coreUnitOfWork.BrokerageRP.DeleteAsync(itemToDelete);
+            itemToDelete.IsDeleted = true;
             try
             {
                 await _coreUnitOfWork.CommitAsync();
