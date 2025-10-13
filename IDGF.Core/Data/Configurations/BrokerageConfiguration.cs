@@ -10,6 +10,7 @@ namespace IDGF.Core.Data.Configurations
         {
             builder.ToTable("opt_Brokers");
             builder.Property(e => e.Name).HasMaxLength(100).IsRequired().HasColumnName("name");
+            //builder.HasQueryFilter(b => !b.IsDeleted);
         }
     }
 }

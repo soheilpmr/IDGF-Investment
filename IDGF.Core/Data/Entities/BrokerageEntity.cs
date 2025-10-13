@@ -15,6 +15,7 @@ namespace IDGF.Core.Data.Entities
         public BrokerageEntity(Brokerage brokerage)
         {
             this.Name = brokerage.Name;
+            this.IsDeleted = brokerage.IsDeleted;
         }
 
     }

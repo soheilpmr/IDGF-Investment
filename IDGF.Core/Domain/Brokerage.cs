@@ -6,5 +6,6 @@ namespace IDGF.Core.Domain
     public class Brokerage : Model<int>
     {
         public string Name { get; set; }
+        public bool IsDeleted { get; set; } = false;
     }
 }
