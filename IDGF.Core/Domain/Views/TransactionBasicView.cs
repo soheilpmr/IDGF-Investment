@@ -11,9 +11,10 @@
         public decimal PricePerUnit { get; set; }    // t.PricePerUnit
         public decimal Quantity { get; set; }            // t.Quantity
         public decimal FaceValue { get; set; }       // b.FaceValue
-        public DateOnly TransactionDate { get; set; } // t.TransactionDate
+        public DateOnly TransactionDate { get; set; } // t.TransactionDate تاریخ سرمایه گذاری
         public decimal Commission { get; set; }      // t.Commission
         public short Status { get; set; }            // t.Status (assuming smallint)
         public string TransactionType { get; set; }  // t.TransactionType
+        public decimal? InvestmentPrice { get; set; }  // t.InvestmentPrice,
     }
 }

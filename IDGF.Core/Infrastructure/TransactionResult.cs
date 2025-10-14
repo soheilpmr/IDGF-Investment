@@ -17,7 +17,8 @@
         public string TransactionType { get; set; }
 
 
-        public decimal InvestmentAmount => PricePerUnit * Quantity;//[مبلغ سرمایه‌گذاری‌شده],
+        //public decimal InvestmentAmount => PricePerUnit * Quantity;//[مبلغ سرمایه‌گذاری‌شده],
+        public decimal? InvestmentPrice { get; set; }//[مبلغ سرمایه‌گذاری‌شده],
         public decimal MaturityAmount => FaceValue * Quantity;// [مبلغ در سررسید],
         public int DaysToMaturity => (MaturityDate.ToDateTime(TimeOnly.MinValue) - TransactionDate.ToDateTime(TimeOnly.MinValue)).Days;// [تعداد روزهای تقویمی],
 
