@@ -8,6 +8,7 @@
         public DateOnly? IssueDate { get; set; }      // b.IssueDate
         public DateOnly MaturityDate { get; set; }   // b.MaturityDate
         public string? BrokerName { get; set; }       // br.Name
+        public int? BrokerId { get; set; }       // br.ID
         public decimal PricePerUnit { get; set; }    // t.PricePerUnit
         public decimal Quantity { get; set; }            // t.Quantity
         public decimal FaceValue { get; set; }       // b.FaceValue

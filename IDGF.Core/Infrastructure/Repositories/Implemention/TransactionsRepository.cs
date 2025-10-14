@@ -53,6 +53,47 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
 
             return result;
         }
+
+        public async Task<LinqDataResult<AggregatedTransactionReportItem>> GetAggregatedTransactionReportAsync(
+            LinqDataRequest request,
+            int? bondId = null,
+            int? brokerId = null,
+            DateOnly? transactionDateFrom = null,
+            DateOnly? transactionDateTo = null)
+        {
+            var query = _context.TransactionBasicViews.AsQueryable().AsNoTracking();
+
+            var filteredQuery = query.Where(t =>
+                t.TransactionType == "Buy" &&
+                t.Status == 2);
+
+            if (bondId.HasValue)
+                filteredQuery = filteredQuery.Where(t => t.BondId == bondId.Value);
+
+            if (brokerId.HasValue)
+                filteredQuery = filteredQuery.Where(t => t.BrokerId == brokerId.Value);
+
+            if (transactionDateFrom.HasValue)
+                filteredQuery = filteredQuery.Where(t => t.TransactionDate >= transactionDateFrom.Value);
+
+            if (transactionDateTo.HasValue)
+                filteredQuery = filteredQuery.Where(t => t.TransactionDate <= transactionDateTo.Value);
+            var groupedQuery = filteredQuery.GroupBy(
+                t => new { t.Symbol, t.MaturityDate },
+                (key, group) => new AggregatedTransactionReportItem
+                {
+                    Symbol = key.Symbol,
+                    DateOfMaturity = key.MaturityDate,
+                    Quantity = group.Sum(x => x.Quantity),
+                    TotalPurchasePrice = group.Sum(x => x.InvestmentPrice),
+                    TotalFaceValue = group.Sum(x => x.Quantity * x.FaceValue)
+                });
+
+            var result = await groupedQuery.ToLinqDataResultAsync<AggregatedTransactionReportItem>(
+                request.Take, request.Skip, request.Sort, request.Filter);
+
+            return result;
+        }
     }
 
  

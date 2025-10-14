@@ -39,5 +39,29 @@ namespace IDGF.Core.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+        
+        
+        [HttpPost]
+        [Route(nameof(GetAggregatedTransactionReport))]
+        public async Task<ActionResult<LinqDataResult<AggregatedTransactionReportItem>>> GetAggregatedTransactionReport(int? bondId = null,
+        int? brokerId = null,
+        DateOnly? transactionDateFrom = null,
+        DateOnly? transactionDateTo = null)
+        {
+            try
+            {
+                var request = await Request.ToLinqDataHttpPostRequest();
+                var res1 = await _transactionService.GetAggregatedReportService(request, bondId, brokerId, transactionDateFrom, transactionDateTo);
+                return Ok(res1);
+            }
+            catch (ServiceException ex)
+            {
+                return StatusCode(500, ex.ToServiceExceptionString());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }
