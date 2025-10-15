@@ -41,7 +41,8 @@ namespace IDGF.Core.Controllers
 
     public class BondsTypeGetDto
     {
-               public string HasCoupon { get; set; }
+        public int ID { get; set; }
+        public string HasCoupon { get; set; }
         public string Name { get; set; }
 
         public BondsTypeGetDto GetDto(BondsType bondsType)

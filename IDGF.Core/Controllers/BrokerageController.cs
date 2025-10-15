@@ -27,13 +27,36 @@ namespace IDGF.Core.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("GetAllBrokerages")]
-        public async Task<ActionResult<LinqDataResult<Brokerage>>> GetAllBrokerages([FromQuery] LinqDataRequest request)
+        [HttpPost(nameof(GetAllBrokeragesPagination))]
+        public async Task<ActionResult<LinqDataResult<Brokerage>>> GetAllBrokeragesPagination()
         {
             try
             {
+                var request = await Request.ToLinqDataHttpPostRequest();
                 var result = await _brokerageService.ItemsAsync(request);
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving brokerages.");
+                return StatusCode(500, "An internal server error occurred.");
+            }
+        }
+
+
+
+        [HttpGet(nameof(GetAllBrokerages))]
+        public async Task<ActionResult<List<BrokerageGetDto>>> GetAllBrokerages()
+        {
+            try
+            {
+                var result = await _brokerageService.ItemsAsync();
+                var rtn = result.Select(ss => new BrokerageGetDto()
+                {
+                    Name = ss.Name,
+                    ID = ss.ID
+                });
+                return Ok(rtn);
             }
             catch (Exception ex)
             {

@@ -13,5 +13,16 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
         {
             _context = coreDbContext;
         }
+
+        public async Task<IReadOnlyList<Brokerage>> GetAllForDropDown()
+        {
+            var result = _context.Brokerages.Select(ss => new Brokerage()
+            {
+                ID = ss.ID,
+                Name = ss.Name
+            }).ToList();
+
+            return result;
+        }
     }
 }

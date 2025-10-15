@@ -1,6 +1,7 @@
 ﻿using BackEndInfrastructure.DynamicLinqCore;
 using BackEndInfrastructure.Infrastructure.Exceptions;
 using BackEndInfrastructure.Infrastructure.Service;
+using IDGF.Core.Controllers.Dtos;
 using IDGF.Core.Data.Entities;
 using IDGF.Core.Domain;
 using IDGF.Core.Infrastructure.UnitOfWork;
@@ -54,6 +55,21 @@ namespace IDGF.Core.Services
             catch (Exception ex)
             {
                 LogRetrieveMultiple(null, request, ex);
+                throw new ServiceStorageException("Error retrieving the Brokerage list ", ex, _serviceLogNumber);
+            }
+        }
+
+        public async Task<List<Brokerage>> ItemsAsync()
+        {
+            try
+            {
+                var f = await _coreUnitOfWork.BrokerageRP.GetAllForDropDown();
+                LogRetrieveMultiple(null);
+                return f.ToList();
+            }
+            catch (Exception ex)
+            {
+                LogRetrieveMultiple(null, null, ex);
                 throw new ServiceStorageException("Error retrieving the Brokerage list ", ex, _serviceLogNumber);
             }
         }
