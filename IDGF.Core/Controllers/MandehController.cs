@@ -23,8 +23,7 @@ namespace IDGF.Core.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete]
-        [Route("Delete")]
+        [HttpDelete(nameof(Delete))]
         public async Task<IActionResult> Delete(int id)
         {
             try
@@ -98,7 +97,6 @@ namespace IDGF.Core.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPut]
-        [Route("Put")]
         public async Task<IActionResult> Put(MandehPutDto mandeh)
         {
             var dbLoadedObject = await _mandehtransactionService.RetrieveByIdAsync(mandeh.ID);

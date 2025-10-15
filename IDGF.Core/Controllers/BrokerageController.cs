@@ -18,9 +18,9 @@ namespace IDGF.Core.Controllers
         private readonly IMapper _mapper;
 
         public BrokerageController(
-       BrokerageService brokerageService,
-       ILogger<BrokerageController> logger,
-       IMapper mapper)
+        BrokerageService brokerageService,
+        ILogger<BrokerageController> logger,
+        IMapper mapper)
         {
             _brokerageService = brokerageService;
             _logger = logger;
