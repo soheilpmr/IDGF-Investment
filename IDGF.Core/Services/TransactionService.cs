@@ -11,6 +11,7 @@ using IDGF.Core.Domain.Views;
 using IDGF.Core.Infrastructure;
 using IDGF.Core.Infrastructure.UnitOfWork;
 using OfficeOpenXml;
+using System;
 using System.Data;
 using System.Text.RegularExpressions;
 
@@ -135,6 +136,111 @@ namespace IDGF.Core.Services
                 LogAdd(null, nameof(UploadFileExcelMelli), innerEx);
                 throw innerEx;
             }   
+        }
+
+        public async Task<List<Transactions>> UploadFileExcelMellat(IFormFile mellatFile)
+        {
+            if (mellatFile == null || mellatFile.Length == 0)
+                throw new UploadFileException("No file uploaded.");
+            try
+            {
+
+                var tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.xlsx");
+                await using (var stream = new FileStream(tempPath, FileMode.Create))
+                    await mellatFile.CopyToAsync(stream);
+
+
+                ExcelPackage.License.SetNonCommercialOrganization("My Noncommercial organization"); using var package = new ExcelPackage(new FileInfo(tempPath));
+                var ws = package.Workbook.Worksheets.First();
+
+                DataTable dt = new();
+                int startRow = 5;
+                int dataStartRow = 7;
+
+                for (int col = 1; col <= ws.Dimension.End.Column; col++)
+                {
+                    string colName = ws.Cells[startRow, col].Text.Trim();
+                    if (string.IsNullOrEmpty(colName))
+                        colName = $"Column{col}";
+                    dt.Columns.Add(colName);
+                }
+
+                for (int row = dataStartRow; row <= ws.Dimension.End.Row; row++)
+                {
+                    var dataRow = dt.NewRow();
+                    for (int col = 1; col <= ws.Dimension.End.Column; col++)
+                        dataRow[col - 1] = ws.Cells[row, col].Text;
+                    dt.Rows.Add(dataRow);
+                }
+
+                var regex = new Regex(@"تعداد\s+([\d,]+).*?\((\D*)(\d*)\).*?نرخ\s+([\d,]+)", RegexOptions.Compiled);
+
+                List<Transactions> extractedRows = new();
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    string desc = row["شرح"]?.ToString()?.Trim() ?? "";
+                    string bedehkar = row.Table.Columns.Contains("بدهکار") ? row["بدهکار"]?.ToString() ?? "" : "";
+
+                    string transactionDate = row?.ItemArray[0]?.ToString() ?? "";
+                    transactionDate = transactionDate.Replace("/", "-");
+                    var dateOnly = BackEndInfrastructure.Utility.DateConvertor.ShamsiToMiladi(transactionDate);
+
+                    if (string.IsNullOrWhiteSpace(desc))
+                        continue;
+
+
+                    if (!desc.StartsWith("علی الحساب خريد"))
+                        continue;
+
+
+                    if (desc.StartsWith("تخفيف"))
+                        continue;
+
+                    var match = regex.Match(desc);
+                    if (!match.Success)
+                        continue;
+
+                    string tedad = match.Groups[1].Value.Replace(",", "").Trim();
+                    string prefix = match.Groups[2].Value.Trim();
+                    string number = match.Groups[3].Value.Trim();
+                    string price = match.Groups[4].Value.Replace(",", "").Trim();
+                    string akhza_code;
+                    decimal bondID = 0; 
+                    if (string.IsNullOrEmpty(prefix) && string.IsNullOrEmpty(number))
+                    {
+                        akhza_code = "N/A";
+                    }
+                    else
+                    {
+                        if (number.Length > 3)
+                            number = number[..3];
+                        akhza_code = prefix + " " + number;
+                        bondID = await bondsService.GetBondIdWithName(akhza_code);
+                    }
+                    extractedRows.Add(new Transactions()
+                    {
+                        Quantity = int.Parse(tedad),
+                        //Akhza = akhzaFinal,
+                        PricePerUnit = decimal.Parse(price),
+                        InvestmentPrice = decimal.TryParse(bedehkar.Replace(",", ""), out var val) ? val : 0,
+                        TransactionDate = dateOnly,
+                        TransactionType = "Buy",
+                        BondId = bondID,
+                        Commission = 0,
+                        BrokerId = (int)BrokersEnum.Mellat,
+                        Status = (byte)TransactionStatusEnum.Unspecified
+                    });
+                }
+                return extractedRows;
+
+            }
+            catch (Exception ex)
+            {
+                var innerEx = new ServiceStorageException("Error extracting Mellat Excel file", ex, _serviceLogNumber);
+                LogAdd(null, nameof(UploadFileExcelMelli), innerEx);
+                throw innerEx;
+            }
         }
 
         public async Task<decimal> AddMutipleAsync(List<Transactions> items)

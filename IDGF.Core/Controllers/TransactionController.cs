@@ -64,93 +64,8 @@ namespace IDGF.Core.Controllers
         {
             try
             {
-                if (file == null || file.Length == 0)
-                    return BadRequest("No file uploaded.");
-
-                var tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.xlsx");
-                await using (var stream = new FileStream(tempPath, FileMode.Create))
-                    await file.CopyToAsync(stream);
-
-
-                ExcelPackage.License.SetNonCommercialOrganization("My Noncommercial organization"); using var package = new ExcelPackage(new FileInfo(tempPath));
-                var ws = package.Workbook.Worksheets.First();
-
-                DataTable dt = new();
-                int startRow = 5; 
-                int dataStartRow = 7;
-
-                for (int col = 1; col <= ws.Dimension.End.Column; col++)
-                {
-                    string colName = ws.Cells[startRow, col].Text.Trim();
-                    if (string.IsNullOrEmpty(colName))
-                        colName = $"Column{col}";
-                    dt.Columns.Add(colName);
-                }
-
-                for (int row = dataStartRow; row <= ws.Dimension.End.Row; row++)
-                {
-                    var dataRow = dt.NewRow();
-                    for (int col = 1; col <= ws.Dimension.End.Column; col++)
-                        dataRow[col - 1] = ws.Cells[row, col].Text;
-                    dt.Rows.Add(dataRow);
-                }
-
-                var regex = new Regex(@"تعداد\s+([\d,]+).*?\((\D*)(\d*)\).*?نرخ\s+([\d,]+)", RegexOptions.Compiled);
-
-                List<dynamic> extractedRows = new();
-
-                foreach (DataRow row in dt.Rows)
-                {
-                    string desc = row["شرح"]?.ToString()?.Trim() ?? "";
-                    string bedehkar = row.Table.Columns.Contains("بدهکار") ? row["بدهکار"]?.ToString() ?? "" : "";
-
-                    if (string.IsNullOrWhiteSpace(desc))
-                        continue;
-
-
-                    if (!desc.StartsWith("علی الحساب خريد"))
-                        continue;
-
-
-                    if (desc.StartsWith("تخفيف"))
-                        continue;
-
-                    var match = regex.Match(desc);
-                    if (!match.Success)
-                        continue;
-
-                    string tedad = match.Groups[1].Value.Replace(",", "").Trim();
-                    string prefix = match.Groups[2].Value.Trim(); 
-                    string number = match.Groups[3].Value.Trim(); 
-                    string price = match.Groups[4].Value.Replace(",", "").Trim();
-                    string akhza_code;
-
-                    if (string.IsNullOrEmpty(prefix) && string.IsNullOrEmpty(number))
-                    {
-                        akhza_code = "N/A"; 
-                    }
-                    else
-                    {
-
-                        if (number.Length > 3)
-                            number = number[..3];
-                        akhza_code = prefix + number;
-                    }
-
-                    extractedRows.Add(new
-                    {
-                        Tedad = int.TryParse(tedad, out var t) ? t : 0,
-                        Akhza = akhza_code,
-                        Price = int.TryParse(price, out var p) ? p : 0,
-                        Bedehkar = decimal.TryParse(bedehkar.Replace(",", ""), out var val) ? val : 0
-                    });
-                }
-
-                // Dapper save logic (commented out as in your example)
-                // using var conn = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
-                // ...
-                // foreach (var item in extractedRows)
-                //     await conn.ExecuteAsync(sql, item);
+                var extractedRows = await transactionService.UploadFileExcelMellat(file);
+                await transactionService.AddMutipleAsync(extractedRows);
 
                 return Ok(new
                 {
@@ -158,11 +73,17 @@ namespace IDGF.Core.Controllers
                     Count = extractedRows.Count,
                     Data = extractedRows
                 });
-
+            }
+            catch (ServiceException ex)
+            {
+                if (ex is UploadFileException)
+                {
+                    return BadRequest(ex.Message);
+                }
+                return StatusCode(500, ex.ToServiceExceptionString());
             }
             catch (Exception ex)
-            { 
-
+            {
                 return StatusCode(500, ex.Message);
             }
         }
