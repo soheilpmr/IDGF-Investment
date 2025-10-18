@@ -184,5 +184,22 @@ namespace IDGF.Core.Services
                 throw new ServiceStorageException($"Error retrieving the BondID from the SymbolName : {name}", ex, _serviceLogNumber);
             }
         }
+        
+        
+        public async Task<decimal> GetBondIdWithDate(DateOnly date)
+        {
+            try
+            {
+                //var f = await _baseRepo.AllItemsAsync(request);
+                var result = await _coreUnitOfWork.BondsRP.GetBondIdWithMaturityDate(date);
+                LogRetrieveSingle(date.ToString());
+                return result;
+            }
+            catch (Exception ex)
+            {
+                LogRetrieveSingle(date.ToString(), ex);
+                throw new ServiceStorageException($"Error retrieving the BondID from the SymbolName : {date}", ex, _serviceLogNumber);
+            }
+        }
     }
 }

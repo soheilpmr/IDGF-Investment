@@ -13,6 +13,7 @@ using IDGF.Core.Infrastructure.UnitOfWork;
 using OfficeOpenXml;
 using System;
 using System.Data;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace IDGF.Core.Services
@@ -234,6 +235,282 @@ namespace IDGF.Core.Services
                 }
                 return extractedRows;
 
+            }
+            catch (Exception ex)
+            {
+                var innerEx = new ServiceStorageException("Error extracting Mellat Excel file", ex, _serviceLogNumber);
+                LogAdd(null, nameof(UploadFileExcelMelli), innerEx);
+                throw innerEx;
+            }
+        }
+        
+        
+        public async Task<List<Transactions>> UploadFileExcelKeshavarzi(IFormFile keshavarziFile)
+        {
+            try
+            {
+                if (keshavarziFile == null || keshavarziFile.Length == 0)
+                    throw new UploadFileException("No file uploaded.");
+
+                var tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.xlsx");
+                await using (var stream = new FileStream(tempPath, FileMode.Create))
+                    await keshavarziFile.CopyToAsync(stream);
+
+                ExcelPackage.License.SetNonCommercialOrganization("My Noncommercial organization");
+                using var package = new ExcelPackage(new FileInfo(tempPath));
+
+                var ws = package.Workbook.Worksheets.FirstOrDefault();
+                if (ws == null || ws.Dimension == null)
+                    throw new UploadFileException("The Excel file is empty or the first worksheet is invalid.");
+
+                DataTable dt = new();
+                int dataStartRow = 8;
+
+                int columnCount = ws.Dimension.End.Column;
+                for (int i = 0; i < columnCount; i++)
+                {
+                    dt.Columns.Add();
+                }
+
+                for (int rowNum = dataStartRow; rowNum <= ws.Dimension.End.Row; rowNum++)
+                {
+                    var wsRow = ws.Cells[rowNum, 1, rowNum, columnCount];
+                    if (wsRow.All(c => string.IsNullOrWhiteSpace(c.Text))) continue;
+
+                    DataRow row = dt.Rows.Add();
+                    for (int col = 1; col <= columnCount; col++)
+                    {
+                        if (col - 1 < dt.Columns.Count)
+                        {
+                            row[col - 1] = ws.Cells[rowNum, col].Text;
+                        }
+                    }
+                }
+
+                var regex = new Regex(@"^خريد[^\d]*([\d,]+).*?(\d{6})\s*(?:\((\D*)(\d*)\))?.*?([\d,]+)",
+                        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+                List<Transactions> extractedRows = new();
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    if (row.ItemArray.Length <= 3) continue;
+
+                    string transactionDateStr = row[0]?.ToString()?.Trim() ?? "";
+                    string desc = row[2]?.ToString()?.Trim() ?? "";
+                    string bedehkar = row[3]?.ToString()?.Trim() ?? "";
+
+
+
+
+                    string descNormalized = desc
+                        .Replace('\u06CC', '\u064A')
+                        .Replace('\u200C', ' ')
+                        .Replace('\u00A0', ' ')
+                        .Trim();
+
+                    if (!descNormalized.StartsWith("خريد"))
+                        continue;
+
+                    var match = regex.Match(descNormalized);
+                    if (!match.Success)
+                        continue;
+
+                    string tedad = match.Groups[1].Value.Replace(",", "");
+                    string instrumentCode = match.Groups[2].Value;
+                    string number = match.Groups[4].Value.Trim();
+                    string price = match.Groups[5].Value.Replace(",", "");
+
+                    string bondDateString = "14" + instrumentCode;
+                    DateOnly bondGregorianDate;
+
+                    try
+                    {
+                        string formattedBondDate = $"{bondDateString.Substring(0, 4)}-{bondDateString.Substring(4, 2)}-{bondDateString.Substring(6, 2)}";
+                        DateOnly bondDateOnly = BackEndInfrastructure.Utility.DateConvertor.ShamsiToMiladi(formattedBondDate);
+                        bondGregorianDate = bondDateOnly;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogAdd(null, $"Invalid instrument code date format: {bondDateString}", ex);
+                        continue;
+                    }
+
+                    decimal bondID = 0;
+                    try
+                    {
+                        bondID = await bondsService.GetBondIdWithDate(bondGregorianDate);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogAdd(null, $"Failed to get BondID for date {bondGregorianDate}", ex);
+                        continue;
+                    }
+
+                    if (bondID == 0)
+                        continue;
+
+                    DateOnly dateOnly;
+                    try
+                    {
+                        string formattedDateStr = transactionDateStr.Replace('/', '-');
+                        dateOnly = BackEndInfrastructure.Utility.DateConvertor.ShamsiToMiladi(formattedDateStr);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogAdd(null, $"Invalid transaction date format: {transactionDateStr}", ex);
+                        continue;
+                    }
+
+                    extractedRows.Add(new Transactions()
+                    {
+                        Quantity = int.Parse(tedad),
+                        //Akhza = akhzaFinal,
+                        PricePerUnit = decimal.Parse(price),
+                        InvestmentPrice = decimal.TryParse(bedehkar.Replace(",", ""), out var val) ? val : 0,
+                        TransactionDate = dateOnly,
+                        TransactionType = "Buy",
+                        BondId = bondID,
+                        Commission = 0,
+                        BrokerId = (int)BrokersEnum.Keshavarzi,
+                        Status = (byte)TransactionStatusEnum.Unspecified
+                    });
+                }
+                return extractedRows;
+            }
+            catch (Exception ex)
+            {
+                var innerEx = new ServiceStorageException("Error extracting Mellat Excel file", ex, _serviceLogNumber);
+                LogAdd(null, nameof(UploadFileExcelMelli), innerEx);
+                throw innerEx;
+            }
+        }
+        
+        
+        public async Task<List<Transactions>> UploadFileExcelSanat(IFormFile sanatFile)
+        {
+            try
+            {
+                if (sanatFile == null || sanatFile.Length == 0)
+                    throw new UploadFileException("No file uploaded.");
+
+                var tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.xlsx");
+                await using (var stream = new FileStream(tempPath, FileMode.Create))
+                    await sanatFile.CopyToAsync(stream);
+
+                ExcelPackage.License.SetNonCommercialOrganization("My Noncommercial organization");
+                using var package = new ExcelPackage(new FileInfo(tempPath));
+
+                var ws = package.Workbook.Worksheets.FirstOrDefault();
+                if (ws == null || ws.Dimension == null)
+                    throw new UploadFileException("The Excel file is empty or the first worksheet is invalid.");
+
+                DataTable dt = new();
+                int headerRow = 7;
+                int dataStartRow = 8;
+
+                int columnCount = ws.Dimension.End.Column;
+                for (int i = 0; i < columnCount; i++)
+                {
+                    dt.Columns.Add();
+                }
+
+                for (int rowNum = dataStartRow; rowNum <= ws.Dimension.End.Row; rowNum++)
+                {
+                    var wsRow = ws.Cells[rowNum, 1, rowNum, columnCount];
+                    if (wsRow.All(c => string.IsNullOrWhiteSpace(c.Text))) continue;
+
+                    DataRow row = dt.Rows.Add();
+                    for (int col = 1; col <= columnCount; col++)
+                    {
+                        if (col - 1 < dt.Columns.Count)
+                        {
+                            row[col - 1] = ws.Cells[rowNum, col].Text;
+                        }
+                    }
+                }
+                var regex = new Regex(@"^خريد[^\d]*([\d,]+).*?(\d{6})\s*(?:\((\D*)(\d*)\))?.*?([\d,]+)",
+                        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+                List<Transactions> extractedRows = new();
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    if (row.ItemArray.Length <= 3) continue;
+                    string transactionDateStr = row[0]?.ToString()?.Trim() ?? "";
+                    string desc = row[2]?.ToString()?.Trim() ?? "";
+                    string bedehkar = row[3]?.ToString()?.Trim() ?? "";
+                    string descNormalized = desc
+                        .Replace('\u06CC', '\u064A')
+                        .Replace('\u200C', ' ')
+                        .Replace('\u00A0', ' ')
+                        .Trim();
+
+                    var match = regex.Match(descNormalized);
+                    if (!match.Success)
+                        continue;
+
+
+                    string tedad = match.Groups[1].Value.Replace(",", "");
+                    string instrumentCode = match.Groups[2].Value;
+                    string price = match.Groups[5].Value.Replace(",", "");
+
+                    string bondDateString = "14" + instrumentCode;
+                    DateOnly bondGregorianDate;
+
+                    try
+                    {
+                        string formattedBondDate = $"{bondDateString.Substring(0, 4)}-{bondDateString.Substring(4, 2)}-{bondDateString.Substring(6, 2)}";
+                        DateOnly bondDateOnly = BackEndInfrastructure.Utility.DateConvertor.ShamsiToMiladi(formattedBondDate);
+                        bondGregorianDate = bondDateOnly;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogAdd(null, $"Invalid instrument code date format: {bondDateString}", ex);
+                        continue;
+                    }
+
+                    decimal bondID = 0;
+                    try
+                    {
+                        bondID = await bondsService.GetBondIdWithDate(bondGregorianDate);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogAdd(null, $"Failed to get BondID for date {bondGregorianDate}", ex);
+                        continue;
+                    }
+
+                    if (bondID == 0)
+                        continue;
+
+                    DateOnly dateOnly;
+                    try
+                    {
+                        string formattedDateStr = transactionDateStr.Replace('/', '-');
+                        dateOnly = BackEndInfrastructure.Utility.DateConvertor.ShamsiToMiladi(formattedDateStr);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogAdd(null, $"Invalid transaction date format: {transactionDateStr}", ex);
+                        continue;
+                    }
+
+                    extractedRows.Add(new Transactions()
+                    {
+                        Quantity = int.Parse(tedad),
+                        //Akhza = akhzaFinal,
+                        PricePerUnit = decimal.Parse(price),
+                        InvestmentPrice = decimal.TryParse(bedehkar.Replace(",", ""), out var val) ? val : 0,
+                        TransactionDate = dateOnly,
+                        TransactionType = "Buy",
+                        BondId = bondID,
+                        Commission = 0,
+                        BrokerId = (int)BrokersEnum.Keshavarzi,
+                        Status = (byte)TransactionStatusEnum.Unspecified
+                    });
+                }
+                return extractedRows;
             }
             catch (Exception ex)
             {

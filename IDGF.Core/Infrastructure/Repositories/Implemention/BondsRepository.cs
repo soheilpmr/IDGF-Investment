@@ -150,5 +150,11 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
             var rtn = await _context.Bonds.Where(ss => ss.Symbol == name).Select(ss => ss.ID).FirstOrDefaultAsync();
             return rtn;
         }
+        
+        public async Task<decimal> GetBondIdWithMaturityDate(DateOnly dateTime)
+        {
+            var rtn = await _context.Bonds.Where(ss => ss.MaturityDate == dateTime).Select(ss => ss.ID).FirstOrDefaultAsync();
+            return rtn;
+        }
     }
 }
