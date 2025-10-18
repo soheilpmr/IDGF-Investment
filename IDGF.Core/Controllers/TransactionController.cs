@@ -309,5 +309,49 @@ namespace IDGF.Core.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
+        [HttpPost(nameof(ApproveMultiTask))]
+        public async Task<IActionResult> ApproveMultiTask(List<decimal> Ids)
+        {
+            try
+            {
+                await transactionService.ApproveMultiTask(Ids);
+                return Ok(new
+                {
+                    Message = "✅ تراکنش‌ها با موفقیت تایید شدند.",
+                    Count = Ids.Count
+                }); 
+            }
+            catch (ServiceException ex)
+            {
+                return StatusCode(500, ex.ToServiceExceptionString());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost(nameof(RejectMultiTask))]
+        public async Task<IActionResult> RejectMultiTask(List<decimal> Ids)
+        {
+            try
+            {
+                await transactionService.RejectMultiTask(Ids);
+                return Ok(new
+                {
+                    Message = "X تراکنش‌ها با موفقیت رد شدند.",
+                    Count = Ids.Count
+                });
+            }
+            catch (ServiceException ex)
+            {
+                return StatusCode(500, ex.ToServiceExceptionString());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }

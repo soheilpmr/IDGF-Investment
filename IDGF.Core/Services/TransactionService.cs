@@ -267,6 +267,64 @@ namespace IDGF.Core.Services
             }
         }
 
+        public async Task<string> ApproveMultiTask(List<decimal> Ids)
+        {
+            try
+            {
+                foreach (var id in Ids)
+                {
+                    var transaction = await _coreUnitOfWork.TransactionRP.GetByIdAsync(id);
+                    if (transaction != null)
+                    {
+                        transaction.Status = (byte)TransactionStatusEnum.Approved;
+                        await _coreUnitOfWork.TransactionRP.UpdateAsync(transaction);
+                        LogModify(transaction, $"Transaction with ID {id} approved.");
+                    }
+                    else
+                    {
+                        LogModify(null, $"Transaction with ID {id} not found.");
+                    }
+                }
+                await _coreUnitOfWork.CommitAsync();
+                return $"Successfully updated transactions , counts are : {Ids.Count}";
+            }
+            catch (Exception ex)
+            {
+                var innerEx = new ServiceStorageException("Error approving items", ex, _serviceLogNumber);
+                LogAdd(null, "Error approving items", innerEx);
+                throw innerEx;
+            }   
+        }
+
+        public async Task<string> RejectMultiTask(List<decimal> Ids)
+        {
+            try
+            {
+                foreach (var id in Ids)
+                {
+                    var transaction = await _coreUnitOfWork.TransactionRP.GetByIdAsync(id);
+                    if (transaction != null)
+                    {
+                        transaction.Status = (byte)TransactionStatusEnum.Rejected;
+                        await _coreUnitOfWork.TransactionRP.UpdateAsync(transaction);
+                        LogModify(transaction, $"Transaction with ID {id} approved.");
+                    }
+                    else
+                    {
+                        LogModify(null, $"Transaction with ID {id} not found.");
+                    }
+                }
+                await _coreUnitOfWork.CommitAsync();
+                return $"Successfully updated transactions , counts are : {Ids.Count}";
+            }
+            catch (Exception ex)
+            {
+                var innerEx = new ServiceStorageException("Error approving items", ex, _serviceLogNumber);
+                LogAdd(null, "Error approving items", innerEx);
+                throw innerEx;
+            }
+        }
+
         public override Task<LinqDataResult<Transactions>> ItemsAsync(LinqDataRequest request)
         {
             throw new NotImplementedException();

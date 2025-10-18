@@ -16,7 +16,7 @@ namespace IDGF.Core.Data.Configurations
             builder.Property(e => e.InvestmentPrice).HasColumnType("decimal(18,0)");
             builder.Property(e => e.PricePerUnit).HasColumnType("decimal(18,0)");
             builder.Property(e => e.Commission).IsRequired().HasColumnType("decimal(18,0)");
-            builder.Property(e => e.YtmAtTransaction).IsRequired().HasColumnType("decimal(10,0)");
+            builder.Property(e => e.YtmAtTransaction).HasColumnType("decimal(10,2)");
             builder.Property(e => e.Status).HasColumnType("smallint").IsRequired();
 
             builder.HasOne(b => b.BondsEntity)
