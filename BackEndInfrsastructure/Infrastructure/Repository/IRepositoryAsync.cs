@@ -22,6 +22,7 @@ namespace BackEndInfrastructure.Infrastructure.Repository
 
 
         Task<ModelItem> InsertAsync(ModelItem item);
+        Task<IEnumerable<ModelItem>> InsertMultipleAsync(IEnumerable<ModelItem> items);
         Task DeleteAsync(ModelItem item);
         Task UpdateAsync(ModelItem item);
     }

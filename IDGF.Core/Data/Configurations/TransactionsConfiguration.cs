@@ -13,6 +13,7 @@ namespace IDGF.Core.Data.Configurations
             builder.Property(e => e.TransactionDate).IsRequired();
             builder.Property(e => e.TransactionType).IsRequired();
             builder.Property(e => e.Quantity).HasColumnType("decimal(18,0)");
+            builder.Property(e => e.InvestmentPrice).HasColumnType("decimal(18,0)");
             builder.Property(e => e.PricePerUnit).HasColumnType("decimal(18,0)");
             builder.Property(e => e.Commission).IsRequired().HasColumnType("decimal(18,0)");
             builder.Property(e => e.YtmAtTransaction).IsRequired().HasColumnType("decimal(10,0)");

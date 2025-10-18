@@ -3,8 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IDGF.Core.Data.Entities
 {
+
     public class TransactionsEntity : Transactions
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // ✅ important : for multipleInstance Adding
+        public override decimal ID { get => base.ID; set => base.ID = value; }
         public TransactionsEntity()
         {
                 
@@ -12,7 +15,6 @@ namespace IDGF.Core.Data.Entities
 
         public TransactionsEntity(Transactions transactions)
         {
-            this.ID = transactions.ID;
             this.TransactionDate = transactions.TransactionDate;
             this.TransactionType = transactions.TransactionType;
             this.Quantity = transactions.Quantity;
@@ -22,6 +24,7 @@ namespace IDGF.Core.Data.Entities
             this.Status = transactions.Status;
             this.BondId = transactions.BondId;
             this.BrokerId = transactions.BrokerId;  
+            this.InvestmentPrice = transactions.InvestmentPrice;  
         }
 
         [ForeignKey(nameof(BondId))]

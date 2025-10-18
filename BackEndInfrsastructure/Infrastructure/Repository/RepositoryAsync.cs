@@ -69,6 +69,20 @@ namespace BackEndInfrastructure.Infrastructure.Repository
             return null;
         }
 
+        public virtual async Task<IEnumerable<DomainModelEntity>> InsertMultipleAsync(IEnumerable<DomainModelEntity> items)
+        {
+            if (items == null || !items.Any())
+                return Enumerable.Empty<DomainModelEntity>();
+
+            // Convert domain models to database entities
+            var dbEntities = items.Select(i => (DBModelEntity)Activator.CreateInstance(typeof(DBModelEntity), i))
+                                  .ToList();
+
+            await _entity.AddRangeAsync(dbEntities);
+            return items;
+        }
+
+
         public virtual async Task UpdateAsync(DomainModelEntity item)
         {
             _dbContext.Entry(item).State = EntityState.Modified;

@@ -3,10 +3,8 @@ using BackEndInfrastructure.Infrastructure.UnitOfWork;
 using BackEndInfrsastructure.Domain;
 using IDGF.Core.Data;
 using IDGF.Core.Domain;
-using IDGF.Core.Infrastructure.Repositories;
 using IDGF.Core.Infrastructure.Repositories.Implemention;
 using IDGF.Core.Infrastructure.Repositories.Interface;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace IDGF.Core.Infrastructure.UnitOfWork
 {
@@ -53,11 +51,12 @@ namespace IDGF.Core.Infrastructure.UnitOfWork
                 ff = BrokerageRP as ILDRCompatibleRepositoryAsync<T, PrimKey>;
 
             }
-            if (typeof(T) == typeof(Transaction))
+            if (typeof(T) == typeof(Transactions))
             {
-                ff = BrokerageRP as ILDRCompatibleRepositoryAsync<T, PrimKey>;
+                ff = TransactionRP as ILDRCompatibleRepositoryAsync<T, PrimKey>;
 
             }
+
             return ff;
         }
     }

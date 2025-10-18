@@ -14,6 +14,7 @@ namespace IDGF.Core.Infrastructure.Repositories.Interface
 
         Task<List<BondsGetDto>> GetAllWithType(int? typeID);
         Task<LinqDataResult<BondsGetDto>> GetAllWithTypeWithPagination(LinqDataRequest request, int? typeID);
+        Task<decimal> GetBondIdWithName(string name);
 
     }
 }

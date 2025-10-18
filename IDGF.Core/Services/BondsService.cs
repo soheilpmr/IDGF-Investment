@@ -167,5 +167,22 @@ namespace IDGF.Core.Services
         {
             throw new NotImplementedException();
         }
+
+        public async Task<decimal> GetBondIdWithName(string name)
+        {
+
+            try
+            {
+                //var f = await _baseRepo.AllItemsAsync(request);
+                var result = await _coreUnitOfWork.BondsRP.GetBondIdWithName(name);
+                LogRetrieveSingle(name);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                LogRetrieveSingle(name, ex);
+                throw new ServiceStorageException($"Error retrieving the BondID from the SymbolName : {name}", ex, _serviceLogNumber);
+            }
+        }
     }
 }

@@ -144,5 +144,11 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
             }
 
         }
+
+        public async Task<decimal> GetBondIdWithName(string name)
+        {
+            var rtn = await _context.Bonds.Where(ss => ss.Symbol == name).Select(ss => ss.ID).FirstOrDefaultAsync();
+            return rtn;
+        }
     }
 }

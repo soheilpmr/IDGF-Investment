@@ -9,6 +9,7 @@ namespace IDGF.Core.Domain
         public decimal Quantity { get; set; }
         public decimal PricePerUnit { get; set; }
         public decimal Commission { get; set; }
+        public decimal InvestmentPrice { get; set; }
         public decimal? YtmAtTransaction { get; set; }
         public short Status { get; set; }
 
