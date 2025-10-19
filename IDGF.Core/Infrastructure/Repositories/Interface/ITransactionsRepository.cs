@@ -14,6 +14,12 @@ namespace IDGF.Core.Infrastructure.Repositories.Interface
         DateOnly? transactionDateFrom = null,
         DateOnly? transactionDateTo = null);
 
+        Task<List<TransactionBasicView>> GetAllItemsReportForExport(
+            int? bondId = null,
+            int? brokerId = null,
+            DateOnly? transactionDateFrom = null,
+            DateOnly? transactionDateTo = null);
+
         Task<LinqDataResult<AggregatedTransactionReportItem>> GetAggregatedTransactionReportAsync(
             LinqDataRequest request,
             int? bondId = null,

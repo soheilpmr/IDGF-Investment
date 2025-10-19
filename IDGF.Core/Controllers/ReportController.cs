@@ -40,6 +40,34 @@ namespace IDGF.Core.Controllers
             }
         }
         
+        [HttpPost]
+        [Route(nameof(ExportGetAllTransactionsReport))]
+        public async Task<ActionResult<LinqDataResult<TransactionResult>>> ExportGetAllTransactionsReport(int? bondId = null,
+        int? brokerId = null,
+        DateOnly? transactionDateFrom = null,
+        DateOnly? transactionDateTo = null)
+        {
+            try
+            {
+                var fileBytes = await _transactionService.ExportAllTransactionReportService(
+                    bondId,
+                    brokerId,
+                    transactionDateFrom,
+                    transactionDateTo);
+
+                string fileName = $"GetAllTransactionsReport_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+                return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+            catch (ServiceException ex)
+            {
+                return StatusCode(500, ex.ToServiceExceptionString());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        
         
         [HttpPost]
         [Route(nameof(GetAggregatedTransactionReport))]

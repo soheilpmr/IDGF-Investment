@@ -702,6 +702,30 @@ namespace IDGF.Core.Services
                 throw new ServiceStorageException("Error exporting the TransactionView list ", ex, _serviceLogNumber);
             }
         }
+        
+        public async Task<byte[]> ExportAllTransactionReportService(
+            int? bondId = null,
+            int? brokerId = null,
+            DateOnly? transactionDateFrom = null,
+            DateOnly? transactionDateTo = null)
+        {
+            try
+            {
+                var data = await _coreUnitOfWork.TransactionRP.GetAllItemsReportForExport(
+                    bondId,
+                    brokerId,
+                    transactionDateFrom,
+                    transactionDateTo);
+
+                var excelBytes = GenerateAllTransactionReportExcel(data);
+                return excelBytes;
+            }
+            catch (Exception ex)
+            {
+                LogRetrieveMultiple(null, null, ex);
+                throw new ServiceStorageException("Error exporting the TransactionView list ", ex, _serviceLogNumber);
+            }
+        }
 
         private byte[] GenerateAggregatedReportExcel(List<AggregatedTransactionReportItem> data)
         {
@@ -745,6 +769,73 @@ namespace IDGF.Core.Services
                 // Format columns
                 worksheet.Cells[2, 2, data.Count + 1, 2].Style.Numberformat.Format = "yyyy-mm-dd"; // Date
                 worksheet.Cells[2, 3, data.Count + 1, 5].Style.Numberformat.Format = "#,##0"; // Numbers
+
+                worksheet.Cells.AutoFitColumns();
+
+                return package.GetAsByteArray();
+            }
+        }
+        
+        private byte[] GenerateAllTransactionReportExcel(List<TransactionBasicView> data)
+        {
+            ExcelPackage.License.SetNonCommercialOrganization("My Noncommercial organization");
+
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Transaction Report");
+
+                // Set Right-to-Left direction for Farsi
+                worksheet.View.RightToLeft = true;
+
+                // Add Headers
+                int col = 1;
+                worksheet.Cells[1, col++].Value = "نماد";
+                worksheet.Cells[1, col++].Value = "نام کارگزار";
+                worksheet.Cells[1, col++].Value = "نوع تراکنش";
+                worksheet.Cells[1, col++].Value = "تاریخ تراکنش";
+                worksheet.Cells[1, col++].Value = "تاریخ سررسید";
+                worksheet.Cells[1, col++].Value = "تاریخ انتشار";
+                worksheet.Cells[1, col++].Value = "تعداد";
+                worksheet.Cells[1, col++].Value = "قیمت هر واحد";
+                worksheet.Cells[1, col++].Value = "مبلغ سرمایه گذاری";
+                worksheet.Cells[1, col++].Value = "کارمزد";
+                worksheet.Cells[1, col++].Value = "ارزش اسمی";
+                worksheet.Cells[1, col++].Value = "وضعیت";
+
+                // Style Headers (12 columns)
+                using (var range = worksheet.Cells[1, 1, 1, 12])
+                {
+                    range.Style.Font.Bold = true;
+                    range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+                }
+
+                // Add Data
+                for (int i = 0; i < data.Count; i++)
+                {
+                    var item = data[i];
+                    int row = i + 2; // Start from row 2
+
+                    col = 1;
+                    worksheet.Cells[row, col++].Value = item.Symbol;
+                    worksheet.Cells[row, col++].Value = item.BrokerName;
+                    worksheet.Cells[row, col++].Value = item.TransactionType;
+                    worksheet.Cells[row, col++].Value = item.TransactionDate.ToDateTime(TimeOnly.MinValue);
+                    worksheet.Cells[row, col++].Value = item.MaturityDate.ToDateTime(TimeOnly.MinValue);
+                    worksheet.Cells[row, col++].Value = item.IssueDate?.ToDateTime(TimeOnly.MinValue);
+                    worksheet.Cells[row, col++].Value = item.Quantity;
+                    worksheet.Cells[row, col++].Value = item.PricePerUnit;
+                    worksheet.Cells[row, col++].Value = item.InvestmentPrice;
+                    worksheet.Cells[row, col++].Value = item.Commission;
+                    worksheet.Cells[row, col++].Value = item.FaceValue;
+                    worksheet.Cells[row, col++].Value = item.StatusText;
+                }
+
+                // Format columns
+                // Dates (Cols 4, 5, 6)
+                worksheet.Cells[2, 4, data.Count + 1, 6].Style.Numberformat.Format = "yyyy-mm-dd";
+                // Numbers (Cols 7, 8, 9, 10, 11)
+                worksheet.Cells[2, 7, data.Count + 1, 11].Style.Numberformat.Format = "#,##0.##";
 
                 worksheet.Cells.AutoFitColumns();
 
