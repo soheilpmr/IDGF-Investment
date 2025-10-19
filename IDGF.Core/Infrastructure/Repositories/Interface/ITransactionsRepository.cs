@@ -10,7 +10,7 @@ namespace IDGF.Core.Infrastructure.Repositories.Interface
         Task<LinqDataResult<TransactionBasicView>> GetAllItemsView(
         LinqDataRequest request,
         int? bondId = null,
-        string? brokerName = null,
+        int? brokerId = null,
         DateOnly? transactionDateFrom = null,
         DateOnly? transactionDateTo = null);
 

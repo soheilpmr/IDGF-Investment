@@ -630,13 +630,13 @@ namespace IDGF.Core.Services
         }
 
         public async Task<LinqDataResult<TransactionResult>> GetAllTransactionViewService(LinqDataRequest linqDataRequest, int? bondId = null,
-        string? brokerName = null,
+        int? brokerId = null,
         DateOnly? transactionDateFrom = null,
         DateOnly? transactionDateTo = null)
         {
             try
             {
-                var rtnView = await _coreUnitOfWork.TransactionRP.GetAllItemsView(linqDataRequest, bondId, brokerName, transactionDateFrom, transactionDateTo);
+                var rtnView = await _coreUnitOfWork.TransactionRP.GetAllItemsView(linqDataRequest, bondId, brokerId, transactionDateFrom, transactionDateTo);
 
                 var mappedData = _mapper.Map<IEnumerable<TransactionResult>>(rtnView.Data);
 

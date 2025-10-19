@@ -29,7 +29,7 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
         public async Task<LinqDataResult<TransactionBasicView>> GetAllItemsView(
             LinqDataRequest request,
             int? bondId = null,
-            string? brokerName = null,
+            int? brokerId = null,
             DateOnly? transactionDateFrom = null,
             DateOnly? transactionDateTo = null)
         {
@@ -39,8 +39,8 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
             if (bondId.HasValue)
                 query = query.Where(t => t.BondId == bondId.Value);
 
-            if (!string.IsNullOrEmpty(brokerName))
-                query = query.Where(t => t.BrokerName == brokerName);
+            if (brokerId.HasValue)
+                query = query.Where(t => t.BrokerId == brokerId);
 
             if (transactionDateFrom.HasValue)
                 query = query.Where(t => t.TransactionDate >= transactionDateFrom.Value);

@@ -20,14 +20,14 @@ namespace IDGF.Core.Controllers
         [HttpPost]
         [Route(nameof(GetAllTransactions))]
         public async Task<ActionResult<LinqDataResult<TransactionResult>>> GetAllTransactions(int? bondId = null,
-        string? brokerName = null,
+        int? brokerId = null,
         DateOnly? transactionDateFrom = null,
         DateOnly? transactionDateTo = null)
         {
             try
             {
                 var request = await Request.ToLinqDataHttpPostRequest();
-                var res1 = await _transactionService.GetAllTransactionViewService(request, bondId, brokerName, transactionDateFrom, transactionDateTo);
+                var res1 = await _transactionService.GetAllTransactionViewService(request, bondId, brokerId, transactionDateFrom, transactionDateTo);
                 return Ok(res1);
             }
             catch (ServiceException ex)
