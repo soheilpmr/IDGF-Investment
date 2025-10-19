@@ -198,7 +198,7 @@ namespace IDGF.Core.Services
             catch (Exception ex)
             {
                 LogRetrieveSingle(date.ToString(), ex);
-                throw new ServiceStorageException($"Error retrieving the BondID from the SymbolName : {date}", ex, _serviceLogNumber);
+                throw new ServiceStorageException($"Error retrieving the BondID from the Date : {date}", ex, _serviceLogNumber);
             }
         }
     }

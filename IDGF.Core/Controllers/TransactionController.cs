@@ -147,6 +147,10 @@ namespace IDGF.Core.Controllers
             {
                 return StatusCode(500, ex.ToServiceExceptionString());
             }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
@@ -168,6 +172,10 @@ namespace IDGF.Core.Controllers
             catch (ServiceException ex)
             {
                 return StatusCode(500, ex.ToServiceExceptionString());
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {

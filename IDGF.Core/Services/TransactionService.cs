@@ -559,7 +559,8 @@ namespace IDGF.Core.Services
                     }
                     else
                     {
-                        LogModify(null, $"Transaction with ID {id} not found.");
+                        LogModify(null, $"Transaction with ID : {id} not found.");
+                        throw new KeyNotFoundException($"Transaction with ID : {id} not found Exception");
                     }
                 }
                 await _coreUnitOfWork.CommitAsync();
@@ -567,6 +568,8 @@ namespace IDGF.Core.Services
             }
             catch (Exception ex)
             {
+                if(ex is KeyNotFoundException)
+                    throw;  
                 var innerEx = new ServiceStorageException("Error approving items", ex, _serviceLogNumber);
                 LogAdd(null, "Error approving items", innerEx);
                 throw innerEx;
@@ -588,7 +591,8 @@ namespace IDGF.Core.Services
                     }
                     else
                     {
-                        LogModify(null, $"Transaction with ID {id} not found.");
+                        LogModify(null, $"Transaction with ID : {id} not found.");
+                        throw new KeyNotFoundException($"Transaction with ID : {id} not found Exception");
                     }
                 }
                 await _coreUnitOfWork.CommitAsync();
@@ -596,8 +600,10 @@ namespace IDGF.Core.Services
             }
             catch (Exception ex)
             {
+                if (ex is KeyNotFoundException)
+                    throw;
                 var innerEx = new ServiceStorageException("Error approving items", ex, _serviceLogNumber);
-                LogAdd(null, "Error approving items", innerEx);
+                LogAdd(null, "Error rejecting items", innerEx);
                 throw innerEx;
             }
         }
