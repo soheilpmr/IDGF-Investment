@@ -3,6 +3,7 @@
     public class BondsGetDto
     {
         //public int ypeID { get; set; }
+        public decimal Id { get; set; }
         public string Symbol { get; set; }
         public DateOnly MaturityDate { get; set; }
         public decimal FaceValue { get; set; }

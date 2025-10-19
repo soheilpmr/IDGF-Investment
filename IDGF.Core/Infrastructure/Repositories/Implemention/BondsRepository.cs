@@ -92,7 +92,7 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
             {
                 return await _context.Bonds
                     .Select(ss => new BondsGetDto
-                    {
+                    {   Id = ss.ID,    
                         Symbol = ss.Symbol,
                         MaturityDate = ss.MaturityDate,
                         FaceValue = ss.FaceValue
@@ -106,6 +106,7 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
                .Where(ss => ss.TypeID == typeID)
                    .Select(ss => new BondsGetDto
                    {
+                       Id = ss.ID,  
                        Symbol = ss.Symbol,
                        MaturityDate = ss.MaturityDate,
                        FaceValue = ss.FaceValue
