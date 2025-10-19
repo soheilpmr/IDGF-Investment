@@ -63,22 +63,22 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
         {
             var query = _context.TransactionBasicViews.AsQueryable().AsNoTracking();
 
-            var filteredQuery = query.Where(t =>
-                t.TransactionType == "Buy" &&
-                t.Status == 2);
+            //var filteredQuery = query.Where(t =>
+            //    t.TransactionType == "Buy" &&
+            //    t.Status == 2);
 
             if (bondId.HasValue)
-                filteredQuery = filteredQuery.Where(t => t.BondId == bondId.Value);
+                query = query.Where(t => t.BondId == bondId.Value);
 
             if (brokerId.HasValue)
-                filteredQuery = filteredQuery.Where(t => t.BrokerId == brokerId.Value);
+                query = query.Where(t => t.BrokerId == brokerId.Value);
 
             if (transactionDateFrom.HasValue)
-                filteredQuery = filteredQuery.Where(t => t.TransactionDate >= transactionDateFrom.Value);
+                query = query.Where(t => t.TransactionDate >= transactionDateFrom.Value);
 
             if (transactionDateTo.HasValue)
-                filteredQuery = filteredQuery.Where(t => t.TransactionDate <= transactionDateTo.Value);
-            var groupedQuery = filteredQuery.GroupBy(
+                query = query.Where(t => t.TransactionDate <= transactionDateTo.Value);
+            var groupedQuery = query.GroupBy(
                 t => new { t.Symbol, t.MaturityDate },
                 (key, group) => new AggregatedTransactionReportItem
                 {
