@@ -1,8 +1,10 @@
 ﻿using BackEndInfrastructure.DynamicLinqCore;
 using BackEndInfrastructure.Infrastructure;
+using IDGF.Core.Controllers.Dtos;
 using IDGF.Core.Data;
 using IDGF.Core.Data.Entities;
 using IDGF.Core.Domain;
+using IDGF.Core.Domain.Enums;
 using IDGF.Core.Domain.Views;
 using IDGF.Core.Infrastructure.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -157,6 +159,48 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
             var result = await groupedQuery.ToListAsync();
 
             return result;
+        }
+
+
+        public async Task<InvestmentReportResult> GetInvestmentReportAsync(
+            DateOnly? transactionDateTo,
+            DateOnly? transactionDateFrom = null)
+        {
+            var query = _context.TransactionBasicViews.AsNoTracking();
+
+            var filteredQuery = query.Where(t =>
+
+                t.TransactionType == "Buy" &&
+
+                t.Status == 2 &&
+                t.TransactionDate <= transactionDateTo &&
+                t.MaturityDate > transactionDateTo &&
+                t.BondTypeId == ((int)BondTypesEnum.IslamicTreasury)
+            );
+
+            if (transactionDateFrom.HasValue)
+            {
+                filteredQuery = filteredQuery.Where(t => t.TransactionDate >= transactionDateFrom.Value);
+            }
+
+            var grandTotal = await filteredQuery.SumAsync(x => x.InvestmentPrice + x.Commission);
+
+            var groupedQuery = filteredQuery.GroupBy(
+                t => t.TransactionDate,
+                (transactionDate, group) => new InvestmentReportItem
+                {
+                    TransactionDate = transactionDate,
+                    TotalInvestmentAmount = group.Sum(x => x.InvestmentPrice + x.Commission)
+                });
+
+            var items = await groupedQuery
+                .OrderBy(item => item.TransactionDate)
+                .ToListAsync();
+            return new InvestmentReportResult
+            {
+                GrandTotal = grandTotal,
+                Items = items
+            };
         }
     }
 }

@@ -119,5 +119,26 @@ namespace IDGF.Core.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+        [HttpPost(nameof(GetInvestmentReportAsync))]
+        public async Task<IActionResult> GetInvestmentReportAsync(
+            [FromQuery] DateOnly? transactionDateFrom = null, 
+            [FromQuery] DateOnly? transactionDateTo = null)
+        {
+            try 
+            { 
+                var result = await _transactionService.GetInvestmentReportAsync(
+                    transactionDateFrom,
+                    transactionDateTo);
+                return Ok(result);
+            }
+            catch (ServiceException ex)
+            {
+                return StatusCode(500, ex.ToServiceExceptionString());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }

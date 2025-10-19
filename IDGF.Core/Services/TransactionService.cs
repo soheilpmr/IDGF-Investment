@@ -4,12 +4,14 @@ using BackEndInfrastructure.DynamicLinqCore;
 using BackEndInfrastructure.Infrastructure;
 using BackEndInfrastructure.Infrastructure.Exceptions;
 using BackEndInfrastructure.Infrastructure.Service;
+using IDGF.Core.Controllers.Dtos;
 using IDGF.Core.Data.Entities;
 using IDGF.Core.Domain;
 using IDGF.Core.Domain.Enums;
 using IDGF.Core.Domain.Views;
 using IDGF.Core.Infrastructure;
 using IDGF.Core.Infrastructure.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System;
@@ -735,17 +737,14 @@ namespace IDGF.Core.Services
             {
                 var worksheet = package.Workbook.Worksheets.Add("Aggregated Report");
 
-                // Set Right-to-Left direction for Farsi
                 worksheet.View.RightToLeft = true;
 
-                // Add Headers
                 worksheet.Cells[1, 1].Value = "نماد";               // Symbol
                 worksheet.Cells[1, 2].Value = "تاریخ سررسید";      // DateOfMaturity
                 worksheet.Cells[1, 3].Value = "تعداد";              // Quantity
                 worksheet.Cells[1, 4].Value = "مبلغ کل خرید";      // TotalPurchasePrice
                 worksheet.Cells[1, 5].Value = "ارزش اسمی کل";     // TotalFaceValue
 
-                // Style Headers
                 using (var range = worksheet.Cells[1, 1, 1, 5])
                 {
                     range.Style.Font.Bold = true;
@@ -753,22 +752,20 @@ namespace IDGF.Core.Services
                     range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
                 }
 
-                // Add Data
                 for (int i = 0; i < data.Count; i++)
                 {
                     var item = data[i];
-                    int row = i + 2; // Start from row 2
+                    int row = i + 2; 
 
                     worksheet.Cells[row, 1].Value = item.Symbol;
-                    worksheet.Cells[row, 2].Value = item.DateOfMaturity.ToDateTime(TimeOnly.MinValue); // Convert DateOnly
+                    worksheet.Cells[row, 2].Value = item.DateOfMaturity.ToDateTime(TimeOnly.MinValue); 
                     worksheet.Cells[row, 3].Value = item.Quantity;
                     worksheet.Cells[row, 4].Value = item.TotalPurchasePrice;
                     worksheet.Cells[row, 5].Value = item.TotalFaceValue;
                 }
 
-                // Format columns
-                worksheet.Cells[2, 2, data.Count + 1, 2].Style.Numberformat.Format = "yyyy-mm-dd"; // Date
-                worksheet.Cells[2, 3, data.Count + 1, 5].Style.Numberformat.Format = "#,##0"; // Numbers
+                worksheet.Cells[2, 2, data.Count + 1, 2].Style.Numberformat.Format = "yyyy-mm-dd"; 
+                worksheet.Cells[2, 3, data.Count + 1, 5].Style.Numberformat.Format = "#,##0"; 
 
                 worksheet.Cells.AutoFitColumns();
 
@@ -784,10 +781,8 @@ namespace IDGF.Core.Services
             {
                 var worksheet = package.Workbook.Worksheets.Add("Transaction Report");
 
-                // Set Right-to-Left direction for Farsi
                 worksheet.View.RightToLeft = true;
 
-                // Add Headers
                 int col = 1;
                 worksheet.Cells[1, col++].Value = "نماد";
                 worksheet.Cells[1, col++].Value = "نام کارگزار";
@@ -802,7 +797,6 @@ namespace IDGF.Core.Services
                 worksheet.Cells[1, col++].Value = "ارزش اسمی";
                 worksheet.Cells[1, col++].Value = "وضعیت";
 
-                // Style Headers (12 columns)
                 using (var range = worksheet.Cells[1, 1, 1, 12])
                 {
                     range.Style.Font.Bold = true;
@@ -810,11 +804,10 @@ namespace IDGF.Core.Services
                     range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
                 }
 
-                // Add Data
                 for (int i = 0; i < data.Count; i++)
                 {
                     var item = data[i];
-                    int row = i + 2; // Start from row 2
+                    int row = i + 2;
 
                     col = 1;
                     worksheet.Cells[row, col++].Value = item.Symbol;
@@ -831,15 +824,36 @@ namespace IDGF.Core.Services
                     worksheet.Cells[row, col++].Value = item.StatusText;
                 }
 
-                // Format columns
-                // Dates (Cols 4, 5, 6)
+
                 worksheet.Cells[2, 4, data.Count + 1, 6].Style.Numberformat.Format = "yyyy-mm-dd";
-                // Numbers (Cols 7, 8, 9, 10, 11)
+
                 worksheet.Cells[2, 7, data.Count + 1, 11].Style.Numberformat.Format = "#,##0.##";
 
                 worksheet.Cells.AutoFitColumns();
 
                 return package.GetAsByteArray();
+            }
+        }
+
+
+        public async Task<InvestmentReportResult> GetInvestmentReportAsync(
+            DateOnly? transactionDateFrom = null,
+            DateOnly? transactionDateTo = null)
+        {
+            try
+            {
+                var effectiveDateTo = transactionDateTo ?? DateOnly.FromDateTime(DateTime.Now);
+
+                var result = await _coreUnitOfWork.TransactionRP.GetInvestmentReportAsync(
+                    effectiveDateTo, 
+                    transactionDateFrom);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                LogRetrieveMultiple(null, null, ex);
+                throw new ServiceStorageException("Error retrieving the investment report ", ex, _serviceLogNumber);
             }
         }
 

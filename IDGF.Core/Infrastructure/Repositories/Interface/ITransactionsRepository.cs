@@ -1,5 +1,6 @@
 ﻿using BackEndInfrastructure.DynamicLinqCore;
 using BackEndInfrastructure.Infrastructure;
+using IDGF.Core.Controllers.Dtos;
 using IDGF.Core.Domain;
 using IDGF.Core.Domain.Views;
 
@@ -30,6 +31,10 @@ namespace IDGF.Core.Infrastructure.Repositories.Interface
         Task<List<AggregatedTransactionReportItem>> GetAggregatedTransactionReportForExportAsync(
             int? bondId = null,
             int? brokerId = null,
+            DateOnly? transactionDateFrom = null,
+            DateOnly? transactionDateTo = null);
+
+        Task<InvestmentReportResult> GetInvestmentReportAsync(
             DateOnly? transactionDateFrom = null,
             DateOnly? transactionDateTo = null);
     }
