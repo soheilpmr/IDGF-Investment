@@ -15,6 +15,7 @@
         public DateOnly TransactionDate { get; set; } // t.TransactionDate تاریخ سرمایه گذاری
         public decimal Commission { get; set; }      // t.Commission
         public short Status { get; set; }            // t.Status (assuming smallint)
+        public string StatusText { get; set; }            // t.[StatusText] (assuming smallint)
         public string TransactionType { get; set; }  // t.TransactionType
         public decimal? InvestmentPrice { get; set; }  // t.InvestmentPrice,
     }

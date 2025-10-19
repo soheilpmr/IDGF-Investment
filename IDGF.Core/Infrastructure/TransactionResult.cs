@@ -14,6 +14,7 @@
         public DateOnly TransactionDate { get; set; }
         public decimal Commission { get; set; }
         public short Status { get; set; }
+        public string? StatusText { get; set; }
         public string TransactionType { get; set; }
 
 
@@ -63,12 +64,12 @@
         public decimal TotalPurchase => (PricePerUnit * Quantity) + Commission;
 
         // Transaction status text
-        public string StatusText => Status switch
-        {
-            1 => "در حال بررسی",
-            2 => "تأیید شده",
-            3 => "رد شده",
-            _ => "نامشخص"
-        };
+        //public string StatusText => Status switch
+        //{
+        //    1 => "در حال بررسی",
+        //    2 => "تأیید شده",
+        //    3 => "رد شده",
+        //    _ => "نامشخص"
+        //};
     }
 }

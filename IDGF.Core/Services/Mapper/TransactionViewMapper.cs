@@ -15,8 +15,8 @@ namespace IDGF.Core.Services.Mapper
             .ForMember(dest => dest.MaturityAmount, opt => opt.Ignore())
             .ForMember(dest => dest.SimpleYield, opt => opt.Ignore())
             .ForMember(dest => dest.YieldToMaturity, opt => opt.Ignore())
-            .ForMember(dest => dest.TotalPurchase, opt => opt.Ignore())
-            .ForMember(dest => dest.StatusText, opt => opt.Ignore());
+            .ForMember(dest => dest.TotalPurchase, opt => opt.Ignore());
+            //.ForMember(dest => dest.StatusText, opt => opt.Ignore());
         }
     }
 }
