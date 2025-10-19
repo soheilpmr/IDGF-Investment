@@ -20,5 +20,11 @@ namespace IDGF.Core.Infrastructure.Repositories.Interface
             int? brokerId = null,
             DateOnly? transactionDateFrom = null,
             DateOnly? transactionDateTo = null);
+        
+        Task<List<AggregatedTransactionReportItem>> GetAggregatedTransactionReportForExportAsync(
+            int? bondId = null,
+            int? brokerId = null,
+            DateOnly? transactionDateFrom = null,
+            DateOnly? transactionDateTo = null);
     }
 }

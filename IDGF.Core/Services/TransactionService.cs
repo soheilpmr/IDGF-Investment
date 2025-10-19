@@ -11,6 +11,7 @@ using IDGF.Core.Domain.Views;
 using IDGF.Core.Infrastructure;
 using IDGF.Core.Infrastructure.UnitOfWork;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using System;
 using System.Data;
 using System.Globalization;
@@ -675,6 +676,79 @@ namespace IDGF.Core.Services
             {
                 LogRetrieveMultiple(null, linqDataRequest, ex);
                 throw new ServiceStorageException("Error retrieving the TransactionView list ", ex, _serviceLogNumber);
+            }
+        }
+
+        public async Task<byte[]> ExportAggregatedReportService(
+            int? bondId = null,
+            int? brokerId = null,
+            DateOnly? transactionDateFrom = null,
+            DateOnly? transactionDateTo = null)
+        {
+            try
+            {
+                var data = await _coreUnitOfWork.TransactionRP.GetAggregatedTransactionReportForExportAsync(
+                    bondId,
+                    brokerId,
+                    transactionDateFrom,
+                    transactionDateTo);
+
+                var excelBytes = GenerateAggregatedReportExcel(data);
+                return excelBytes;
+            }
+            catch (Exception ex)
+            {
+                LogRetrieveMultiple(null, null, ex);
+                throw new ServiceStorageException("Error exporting the TransactionView list ", ex, _serviceLogNumber);
+            }
+        }
+
+        private byte[] GenerateAggregatedReportExcel(List<AggregatedTransactionReportItem> data)
+        {
+            ExcelPackage.License.SetNonCommercialOrganization("My Noncommercial organization");
+
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Aggregated Report");
+
+                // Set Right-to-Left direction for Farsi
+                worksheet.View.RightToLeft = true;
+
+                // Add Headers
+                worksheet.Cells[1, 1].Value = "نماد";               // Symbol
+                worksheet.Cells[1, 2].Value = "تاریخ سررسید";      // DateOfMaturity
+                worksheet.Cells[1, 3].Value = "تعداد";              // Quantity
+                worksheet.Cells[1, 4].Value = "مبلغ کل خرید";      // TotalPurchasePrice
+                worksheet.Cells[1, 5].Value = "ارزش اسمی کل";     // TotalFaceValue
+
+                // Style Headers
+                using (var range = worksheet.Cells[1, 1, 1, 5])
+                {
+                    range.Style.Font.Bold = true;
+                    range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+                }
+
+                // Add Data
+                for (int i = 0; i < data.Count; i++)
+                {
+                    var item = data[i];
+                    int row = i + 2; // Start from row 2
+
+                    worksheet.Cells[row, 1].Value = item.Symbol;
+                    worksheet.Cells[row, 2].Value = item.DateOfMaturity.ToDateTime(TimeOnly.MinValue); // Convert DateOnly
+                    worksheet.Cells[row, 3].Value = item.Quantity;
+                    worksheet.Cells[row, 4].Value = item.TotalPurchasePrice;
+                    worksheet.Cells[row, 5].Value = item.TotalFaceValue;
+                }
+
+                // Format columns
+                worksheet.Cells[2, 2, data.Count + 1, 2].Style.Numberformat.Format = "yyyy-mm-dd"; // Date
+                worksheet.Cells[2, 3, data.Count + 1, 5].Style.Numberformat.Format = "#,##0"; // Numbers
+
+                worksheet.Cells.AutoFitColumns();
+
+                return package.GetAsByteArray();
             }
         }
 

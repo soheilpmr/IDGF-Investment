@@ -63,5 +63,33 @@ namespace IDGF.Core.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpPost(nameof(ExportAggregatedTransactionReport))]
+        public async Task<IActionResult> ExportAggregatedTransactionReport(
+            int? bondId = null,
+            int? brokerId = null,
+            DateOnly? transactionDateFrom = null,
+            DateOnly? transactionDateTo = null)
+        {
+            try
+            {
+                var fileBytes = await _transactionService.ExportAggregatedReportService(
+                    bondId,
+                    brokerId,
+                    transactionDateFrom,
+                    transactionDateTo);
+
+                string fileName = $"AggregatedReport_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+                return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+            catch (ServiceException ex)
+            {
+                return StatusCode(500, ex.ToServiceExceptionString());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }

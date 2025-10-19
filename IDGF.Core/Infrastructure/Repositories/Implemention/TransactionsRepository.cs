@@ -94,8 +94,40 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
 
             return result;
         }
+
+        public async Task<List<AggregatedTransactionReportItem>> GetAggregatedTransactionReportForExportAsync(
+            int? bondId = null,
+            int? brokerId = null,
+            DateOnly? transactionDateFrom = null,
+            DateOnly? transactionDateTo = null)
+        {
+            var query = _context.TransactionBasicViews.AsQueryable().AsNoTracking();
+
+            if (bondId.HasValue)
+                query = query.Where(t => t.BondId == bondId.Value);
+
+            if (brokerId.HasValue)
+                query = query.Where(t => t.BrokerId == brokerId.Value);
+
+            if (transactionDateFrom.HasValue)
+                query = query.Where(t => t.TransactionDate >= transactionDateFrom.Value);
+
+            if (transactionDateTo.HasValue)
+                query = query.Where(t => t.TransactionDate <= transactionDateTo.Value);
+
+            var groupedQuery = query.GroupBy(
+                t => new { t.Symbol, t.MaturityDate },
+                (key, group) => new AggregatedTransactionReportItem
+                {
+                    Symbol = key.Symbol,
+                    DateOfMaturity = key.MaturityDate,
+                    Quantity = group.Sum(x => x.Quantity),
+                    TotalPurchasePrice = group.Sum(x => x.InvestmentPrice),
+                    TotalFaceValue = group.Sum(x => x.Quantity * x.FaceValue)
+                });
+            var result = await groupedQuery.ToListAsync();
+
+            return result;
+        }
     }
-
- 
-
 }
