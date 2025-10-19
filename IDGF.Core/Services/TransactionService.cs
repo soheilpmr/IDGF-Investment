@@ -297,7 +297,7 @@ namespace IDGF.Core.Services
                 {
                     if (row.ItemArray.Length <= 3) continue;
 
-                    string transactionDateStr = row[0]?.ToString()?.Trim() ?? "";
+                    string transactionDateStr = row[1]?.ToString()?.Trim() ?? "";
                     string desc = row[2]?.ToString()?.Trim() ?? "";
                     string bedehkar = row[3]?.ToString()?.Trim() ?? "";
 
@@ -438,7 +438,7 @@ namespace IDGF.Core.Services
                 foreach (DataRow row in dt.Rows)
                 {
                     if (row.ItemArray.Length <= 3) continue;
-                    string transactionDateStr = row[0]?.ToString()?.Trim() ?? "";
+                    string transactionDateStr = row[1]?.ToString()?.Trim() ?? "";
                     string desc = row[2]?.ToString()?.Trim() ?? "";
                     string bedehkar = row[3]?.ToString()?.Trim() ?? "";
                     string descNormalized = desc
