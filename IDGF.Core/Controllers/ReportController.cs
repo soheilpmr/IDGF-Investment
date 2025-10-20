@@ -119,6 +119,7 @@ namespace IDGF.Core.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
         [HttpPost(nameof(GetInvestmentReportAsync))]
         public async Task<IActionResult> GetInvestmentReportAsync(
             [FromQuery] DateOnly? transactionDateFrom = null, 
@@ -127,6 +128,28 @@ namespace IDGF.Core.Controllers
             try 
             { 
                 var result = await _transactionService.GetInvestmentReportAsync(
+                    transactionDateFrom,
+                    transactionDateTo);
+                return Ok(result);
+            }
+            catch (ServiceException ex)
+            {
+                return StatusCode(500, ex.ToServiceExceptionString());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        
+        [HttpPost(nameof(GetCashInflowReportAsync))]
+        public async Task<IActionResult> GetCashInflowReportAsync(
+            [FromQuery] DateOnly? transactionDateFrom = null, 
+            [FromQuery] DateOnly? transactionDateTo = null)
+        {
+            try 
+            { 
+                var result = await _transactionService.GetCashInflowReportAsync(
                     transactionDateFrom,
                     transactionDateTo);
                 return Ok(result);

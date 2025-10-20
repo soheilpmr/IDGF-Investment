@@ -857,6 +857,23 @@ namespace IDGF.Core.Services
             }
         }
 
+        public async Task<CashInflowReportResult> GetCashInflowReportAsync(
+            DateOnly? transactionDateFrom = null,
+            DateOnly? transactionDateTo = null)
+        {
+            try
+            {
+                var dateFrom = transactionDateFrom ?? DateOnly.FromDateTime(DateTime.Now);
+                var result = await _coreUnitOfWork.TransactionRP.GetCashInflowReportAsync(dateFrom, transactionDateTo);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                LogRetrieveMultiple(null, null, ex);
+                throw new ServiceStorageException("Error retrieving the cash inflow report", ex, _serviceLogNumber);
+            }
+        }
+
         protected override Task ValidateOnAddAsync(Transactions item)
         {
             throw new NotImplementedException();

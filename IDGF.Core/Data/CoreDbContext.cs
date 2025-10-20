@@ -23,6 +23,8 @@ namespace IDGF.Core.Data
         public DbSet<BondsTypeEntity> BondTypes { get; set; }
         public DbSet<BondsEntity> Bonds { get; set; }
         public DbSet<BrokerageEntity> Brokerages { get; set; }
+        public DbSet<TransactionsEntity> Transactions { get; set; }
+        public DbSet<CouponPaymentsEntity> CouponPayments { get; set; }
 
         #region Query-Sets
         public DbSet<TransactionBasicViewEntity> TransactionBasicViews { get; set; }
@@ -35,6 +37,7 @@ namespace IDGF.Core.Data
             modelBuilder.ApplyConfiguration(new BondsConfiguration());
             modelBuilder.ApplyConfiguration(new BrokerageConfiguration());
             modelBuilder.ApplyConfiguration(new TransactionsConfiguration());
+            modelBuilder.ApplyConfiguration(new CouponPaymentsConfiguration());
 
             modelBuilder.Entity<TransactionBasicViewEntity>().ToView("vw_TransactionBasic");
         }

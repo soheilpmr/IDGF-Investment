@@ -37,5 +37,9 @@ namespace IDGF.Core.Infrastructure.Repositories.Interface
         Task<InvestmentReportResult> GetInvestmentReportAsync(
             DateOnly? transactionDateFrom = null,
             DateOnly? transactionDateTo = null);
+
+        Task<CashInflowReportResult> GetCashInflowReportAsync(
+            DateOnly? dateFrom = null,
+            DateOnly? dateTo = null);
     }
 }
