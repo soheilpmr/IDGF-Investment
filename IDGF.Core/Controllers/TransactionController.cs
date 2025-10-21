@@ -1,6 +1,7 @@
 ﻿using BackEndInfrastructure.Infrastructure.Exceptions;
 using IDGF.Core.Domain;
 using IDGF.Core.Domain.Enums;
+using IDGF.Core.Infrastructure.Repositories.Interface;
 using IDGF.Core.Infrastructure.UnitOfWork;
 using IDGF.Core.Services;
 using Microsoft.AspNetCore.Http;

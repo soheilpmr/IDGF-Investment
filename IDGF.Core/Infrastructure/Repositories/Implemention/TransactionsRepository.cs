@@ -204,8 +204,8 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
         }
 
         public async Task<CashInflowReportResult> GetCashInflowReportAsync(
-    DateOnly? dateFrom,
-    DateOnly? dateTo)
+            DateOnly? dateFrom,
+            DateOnly? dateTo)
         {
             var ownedBonds = _context.Transactions
                 .AsNoTracking()
@@ -284,5 +284,76 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
                 Items = finalReport
             };
         }
+
+        public async Task<BondAndTransactionSummaryDto> GetBondAndTransactionSummaryAsync(DateOnly dateOnly)
+        {
+
+            // 1️⃣ Latest Mandeh Transaction
+            var latestDate = await _context.MndehTransactions
+                .Where(m => m.Taeed == 2 && m.TransactionDate <= dateOnly)
+                .MaxAsync(m => m.TransactionDate);
+
+            var latestTime = await _context.MndehTransactions
+                .Where(m => m.Taeed == 2 && m.TransactionDate == latestDate)
+                .MaxAsync(m => m.TransactionTime);
+
+            var latestTransactions = await _context.MndehTransactions
+                .Where(m => m.Taeed == 2
+                    && m.TransactionDate == latestDate
+                    && m.TransactionTime == latestTime)
+                .Select(m => new { m.Mablagh, m.DarRah })
+                .FirstOrDefaultAsync();
+
+            // IslamicTreasury Bond Summary
+            var khazaneh = _context.Bonds
+                .Where(b => b.TypeID == (int)BondTypesEnum.IslamicTreasury && b.MaturityDate > dateOnly);
+
+            var khazanehKharid = _context.Transactions
+                .Where(t => t.Status == (int)TransactionStatusEnum.Approved && t.TransactionDate <= dateOnly);
+
+            var totalSumKhazaneKharid = await (
+                from kh in khazaneh
+                join khk in khazanehKharid on kh.ID equals khk.BondId
+                select khk.InvestmentPrice + khk.Commission
+            ).SumAsync();
+
+            // GovernmentBond Bond Summary
+            var ejareDolat = _context.Bonds
+             .Where(b => b.TypeID == (int)BondTypesEnum.GovernmentBond && b.MaturityDate > dateOnly);
+
+            var ejareDolatKharid = _context.Transactions
+                .Where(t => t.Status == (int)TransactionStatusEnum.Approved && t.TransactionDate <= dateOnly);
+
+            var totalSumeEjareDolatKharid = await (
+                from kh in ejareDolat
+                join khk in ejareDolatKharid on kh.ID equals khk.BondId
+                select khk.InvestmentPrice + khk.Commission
+            ).SumAsync();
+
+            // PartnershipBond Bond Summary
+            var PartnershipBond = _context.Bonds
+             .Where(b => b.TypeID == (int)BondTypesEnum.PartnershipBond && b.MaturityDate > dateOnly);
+
+            var PartnershipBondKharid = _context.Transactions
+                .Where(t => t.Status == (int)TransactionStatusEnum.Approved && t.TransactionDate <= dateOnly);
+
+            var totalSumePartnershipBondKharid = await (
+                from kh in PartnershipBond
+                join khk in PartnershipBondKharid on kh.ID equals khk.BondId
+                select khk.InvestmentPrice + khk.Commission
+            ).SumAsync();
+
+            // Return combined result
+            return new BondAndTransactionSummaryDto()
+            {
+                IncomeConcentrationAccountBalanceWithTheCentralBank = latestTransactions.Mablagh,
+                ChecksInTransit = latestTransactions.DarRah,
+                InvestmentBalance = totalSumePartnershipBondKharid + totalSumeEjareDolatKharid + totalSumKhazaneKharid,
+                TotalSum = totalSumePartnershipBondKharid + totalSumeEjareDolatKharid + totalSumKhazaneKharid + ((decimal)latestTransactions.Mablagh),
+                CanbekeptwiththeCentralBank30 = ((decimal)(latestTransactions.Mablagh)) * 30 / 100,
+                Investable70 = ((decimal)(latestTransactions.Mablagh)) * 70 / 100
+            }; 
+        }
+
     }
 }

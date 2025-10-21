@@ -163,5 +163,23 @@ namespace IDGF.Core.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpGet(nameof(GetBondAndTransactionSummaryAsync))]
+        public async Task<IActionResult> GetBondAndTransactionSummaryAsync(DateOnly dateOnly)
+        {
+            try
+            {
+                var result = await _transactionService.GetBondAndTransactionSummaryAsync(dateOnly);
+                return Ok(result);
+            }
+            catch (ServiceException ex)
+            {
+                return StatusCode(500, ex.ToServiceExceptionString());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }

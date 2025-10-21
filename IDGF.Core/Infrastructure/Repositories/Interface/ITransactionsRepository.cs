@@ -41,5 +41,17 @@ namespace IDGF.Core.Infrastructure.Repositories.Interface
         Task<CashInflowReportResult> GetCashInflowReportAsync(
             DateOnly? dateFrom = null,
             DateOnly? dateTo = null);
+
+        Task<BondAndTransactionSummaryDto> GetBondAndTransactionSummaryAsync(DateOnly dateOnly);
+    }
+
+    public class BondAndTransactionSummaryDto
+    {
+        public decimal InvestmentBalance { get; set; }//مانده سرمایه گذاری ها
+        public double ChecksInTransit { get; set; } //چک های در راه
+        public decimal TotalSum { get; set; }//جمع
+        public double IncomeConcentrationAccountBalanceWithTheCentralBank { get; set; }//مانده حساب تمرکز درآمد نزد بانک مرکزی
+        public decimal CanbekeptwiththeCentralBank30 { get; set; }//مانده حساب تمرکز درآمد نزد بانک مرکزی
+        public decimal Investable70 { get; set; } //۷۰ درصد قابل سرمایه گذاری
     }
 }

@@ -10,6 +10,7 @@ using IDGF.Core.Domain;
 using IDGF.Core.Domain.Enums;
 using IDGF.Core.Domain.Views;
 using IDGF.Core.Infrastructure;
+using IDGF.Core.Infrastructure.Repositories.Interface;
 using IDGF.Core.Infrastructure.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
@@ -247,7 +248,6 @@ namespace IDGF.Core.Services
             }
         }
         
-        
         public async Task<List<Transactions>> UploadFileExcelKeshavarzi(IFormFile keshavarziFile)
         {
             try
@@ -388,7 +388,6 @@ namespace IDGF.Core.Services
                 throw innerEx;
             }
         }
-        
         
         public async Task<List<Transactions>> UploadFileExcelSanat(IFormFile sanatFile)
         {
@@ -607,6 +606,21 @@ namespace IDGF.Core.Services
                     throw;
                 var innerEx = new ServiceStorageException("Error approving items", ex, _serviceLogNumber);
                 LogAdd(null, "Error rejecting items", innerEx);
+                throw innerEx;
+            }
+        }
+
+        public async Task<BondAndTransactionSummaryDto> GetBondAndTransactionSummaryAsync(DateOnly dateOnly)
+        {
+            try
+            {
+                var result = await _coreUnitOfWork.TransactionRP.GetBondAndTransactionSummaryAsync(dateOnly);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                var innerEx = new ServiceStorageException("Error retrieving BondAndTransactionSummary", ex, _serviceLogNumber);
+                LogRetrieveMultiple(null, null, innerEx);
                 throw innerEx;
             }
         }
