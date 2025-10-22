@@ -9,7 +9,7 @@ namespace IDGF.Core.Data.Configurations
         public void Configure(EntityTypeBuilder<BrokerageEntity> builder)
         {
             builder.ToTable("opt_Brokers");
-            builder.Property(e => e.Name).HasMaxLength(100).IsRequired().HasColumnName("name");
+            builder.Property(e => e.Name).HasMaxLength(100).IsRequired().HasColumnName("Name");
             //builder.HasQueryFilter(b => !b.IsDeleted);
         }
     }

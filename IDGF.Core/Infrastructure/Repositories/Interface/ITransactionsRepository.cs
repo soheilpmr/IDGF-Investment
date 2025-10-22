@@ -42,16 +42,40 @@ namespace IDGF.Core.Infrastructure.Repositories.Interface
             DateOnly? dateFrom = null,
             DateOnly? dateTo = null);
 
-        Task<BondAndTransactionSummaryDto> GetBondAndTransactionSummaryAsync(DateOnly dateOnly);
+        Task<(double Mablagh, double DarRah, decimal TotalSumKhazaneKharid, decimal TotalSumeEjareDolatKharid, decimal TotalSumePartnershipBondKharid)>
+             GetBondAndTransactionSummaryAsync(DateOnly dateOnly);
     }
 
     public class BondAndTransactionSummaryDto
     {
+        /// <summary>
+        /// مانده سرمایه گذاری ها
+        /// </summary>
         public decimal InvestmentBalance { get; set; }//مانده سرمایه گذاری ها
+        /// <summary>
+        /// چک های در راه
+        /// </summary>
         public double ChecksInTransit { get; set; } //چک های در راه
+        /// <summary>
+        /// جمع
+        /// </summary>
         public decimal TotalSum { get; set; }//جمع
+        /// <summary>
+        /// مانده حساب تمرکز درآمد نزد بانک مرکزی
+        /// </summary>
         public double IncomeConcentrationAccountBalanceWithTheCentralBank { get; set; }//مانده حساب تمرکز درآمد نزد بانک مرکزی
+        /// <summary>
+        /// مانده حساب تمرکز درآمد نزد بانک مرکزی
+        /// </summary>
         public decimal CanbekeptwiththeCentralBank30 { get; set; }//مانده حساب تمرکز درآمد نزد بانک مرکزی
+        /// <summary>
+        /// درصد قابل سرمایه گذاری
+        /// </summary>
         public decimal Investable70 { get; set; } //۷۰ درصد قابل سرمایه گذاری
+        /// <summary>
+        /// مازاد
+        /// </summary>
+        public decimal Surplus { get; set; } //مازاد
+
     }
 }

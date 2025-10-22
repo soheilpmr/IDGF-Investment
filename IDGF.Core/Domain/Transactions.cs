@@ -15,6 +15,7 @@ namespace IDGF.Core.Domain
 
 
         public decimal BondId { get; set; }
+        public int BondTypeId { get; set; }
         public int BrokerId { get; set; }
     }
 }

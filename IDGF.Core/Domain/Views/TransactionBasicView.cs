@@ -4,7 +4,7 @@
     {
         public decimal Id { get; set; }                  // t.Id
         public decimal BondId { get; set; }              // b.Id
-        public decimal BondTypeId { get; set; }              // b.TypeId
+        public int BondTypeId { get; set; }              // b.TypeId
         public string Symbol { get; set; }           // b.Symbol
         public DateOnly? IssueDate { get; set; }      // b.IssueDate
         public DateOnly MaturityDate { get; set; }   // b.MaturityDate

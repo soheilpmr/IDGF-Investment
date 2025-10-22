@@ -165,11 +165,15 @@ namespace IDGF.Core.Controllers
         }
 
         [HttpGet(nameof(GetBondAndTransactionSummaryAsync))]
-        public async Task<IActionResult> GetBondAndTransactionSummaryAsync(DateOnly dateOnly)
+        public async Task<IActionResult> GetBondAndTransactionSummaryAsync(DateOnly dateOnly, int percent1, int percent2)
         {
             try
             {
-                var result = await _transactionService.GetBondAndTransactionSummaryAsync(dateOnly);
+                if((percent1 < percent2) || (percent1 + percent2) != 100)
+                {
+                    return StatusCode(500,"مجموع اعداد ورودی باید 100 باید , و ورودی نسبت اول نباید از ورودی نسبت دوم کمتر باشد");
+                }
+                var result = await _transactionService.GetBondAndTransactionSummaryAsync(dateOnly, percent1, percent2);
                 return Ok(result);
             }
             catch (ServiceException ex)

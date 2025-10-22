@@ -285,7 +285,8 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
             };
         }
 
-        public async Task<BondAndTransactionSummaryDto> GetBondAndTransactionSummaryAsync(DateOnly dateOnly)
+        public async Task<(double Mablagh, double DarRah, decimal TotalSumKhazaneKharid, decimal TotalSumeEjareDolatKharid, decimal TotalSumePartnershipBondKharid)>
+            GetBondAndTransactionSummaryAsync(DateOnly dateOnly)
         {
 
             // 1️⃣ Latest Mandeh Transaction
@@ -344,15 +345,13 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
             ).SumAsync();
 
             // Return combined result
-            return new BondAndTransactionSummaryDto()
-            {
-                IncomeConcentrationAccountBalanceWithTheCentralBank = latestTransactions.Mablagh,
-                ChecksInTransit = latestTransactions.DarRah,
-                InvestmentBalance = totalSumePartnershipBondKharid + totalSumeEjareDolatKharid + totalSumKhazaneKharid,
-                TotalSum = totalSumePartnershipBondKharid + totalSumeEjareDolatKharid + totalSumKhazaneKharid + ((decimal)latestTransactions.Mablagh),
-                CanbekeptwiththeCentralBank30 = ((decimal)(latestTransactions.Mablagh)) * 30 / 100,
-                Investable70 = ((decimal)(latestTransactions.Mablagh)) * 70 / 100
-            }; 
+           return (
+                Mablagh: latestTransactions != null ? latestTransactions.Mablagh : 0,
+                DarRah: latestTransactions != null ? latestTransactions.DarRah : 0,
+                TotalSumKhazaneKharid: totalSumKhazaneKharid,
+                TotalSumeEjareDolatKharid: totalSumeEjareDolatKharid,
+                TotalSumePartnershipBondKharid: totalSumePartnershipBondKharid
+            );
         }
 
     }

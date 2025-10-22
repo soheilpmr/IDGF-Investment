@@ -11,21 +11,21 @@ namespace IDGF.Core.Data.Configurations
         {
             builder.ToTable("opt_CouponPayments");
             builder.Property(s => s.ID)
-            .HasColumnName("id")
+            .HasColumnName("Id")
             .HasColumnType("decimal(18,0)")
             .ValueGeneratedOnAdd();
 
             builder.Property(e => e.AmountPerUnit)
-                .HasColumnName("amount_per_unit")
+                .HasColumnName("AmountPerUnit")
                 .HasColumnType("decimal(18,2)")
                 .IsRequired();
 
             builder.Property(e => e.PaymentDate)
-                .HasColumnName("payment_date") 
+                .HasColumnName("PaymentDate") 
                 .IsRequired();
 
             builder.Property(e => e.BondId)
-                .HasColumnName("bond_id") 
+                .HasColumnName("BondId") 
                 .HasColumnType("decimal(18,0)")
                 .IsRequired();
 

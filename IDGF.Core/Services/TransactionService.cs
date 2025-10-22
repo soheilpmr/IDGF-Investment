@@ -610,12 +610,22 @@ namespace IDGF.Core.Services
             }
         }
 
-        public async Task<BondAndTransactionSummaryDto> GetBondAndTransactionSummaryAsync(DateOnly dateOnly)
+        public async Task<BondAndTransactionSummaryDto> GetBondAndTransactionSummaryAsync(DateOnly dateOnly, int Percent1, int Percent2)
         {
             try
             {
                 var result = await _coreUnitOfWork.TransactionRP.GetBondAndTransactionSummaryAsync(dateOnly);
-                return result;
+                return new BondAndTransactionSummaryDto()
+                {
+                    IncomeConcentrationAccountBalanceWithTheCentralBank = result.Mablagh,
+                    ChecksInTransit = result.DarRah,
+                    InvestmentBalance = result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid,
+                    TotalSum = result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid + ((decimal)result.Mablagh),
+                    CanbekeptwiththeCentralBank30 = (result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid + ((decimal)result.Mablagh)) * Percent1 / 100,
+                    Investable70 = (result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid + ((decimal)result.Mablagh)) * Percent2 / 100,
+                    Surplus = (result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid) -
+              ((result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid + ((decimal)result.Mablagh)) * Percent2 / 100)
+                };
             }
             catch (Exception ex)
             {
