@@ -1,10 +1,12 @@
 ﻿using BackEndInfrastructure.DynamicLinqCore;
+using BackEndInfrastructure.DynamicLinqCore.Helper;
 using BackEndInfrastructure.Infrastructure;
 using BackEndInfrastructure.Infrastructure.Exceptions;
 using BackEndInfrastructure.Infrastructure.Service;
 using IDGF.Core.Data.Entities;
 using IDGF.Core.Domain;
 using IDGF.Core.Infrastructure.UnitOfWork;
+using System.Linq.Dynamic.Core;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace IDGF.Core.Services
@@ -51,7 +53,13 @@ namespace IDGF.Core.Services
         {
             try
             {
-                //var f = await _baseRepo.AllItemsAsync(request);
+                if (request.Sort == null || !request.Sort.Any())
+                {
+                    request.Sort = new List<Sort>
+                    {
+                        new Sort { Field = "TransactionDate", Dir = "desc" }
+                    };
+                }
                 var f = await _coreUnitOfWork.MandehTransactionsRP.AllItemsAsync(request);
                 LogRetrieveMultiple(null, request);
                 return f;
@@ -69,7 +77,7 @@ namespace IDGF.Core.Services
             {
                 var f = await _coreUnitOfWork.MandehTransactionsRP.AllItemsAsync();
                 LogRetrieveMultiple(null);
-                return f.ToList();
+                return f.OrderByDescending(t => t.TransactionDate).ToList();
             }
             catch (Exception ex)
             {

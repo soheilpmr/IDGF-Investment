@@ -121,7 +121,7 @@ namespace IDGF.Core.Controllers
 
                 return Ok(new
                 {
-                    Message = "✅ Bank Sanat va Madan file processed successfully.",
+                    Message = "✅ مقادیر با موفقیت استخراج و ذخیره شدند.",
                     Count = extractedRows.Count,
                     Data = extractedRows
                 });
