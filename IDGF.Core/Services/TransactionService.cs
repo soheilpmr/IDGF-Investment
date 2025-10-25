@@ -624,7 +624,7 @@ namespace IDGF.Core.Services
                     CanbekeptwiththeCentralBank30 = (result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid + ((decimal)result.Mablagh)) * Percent2 / 100,
                     Investable70 = (result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid + ((decimal)result.Mablagh)) * Percent1 / 100,
                     Surplus = (result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid) -
-              ((result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid + ((decimal)result.Mablagh)) * Percent2 / 100)
+              ((result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid + ((decimal)result.Mablagh)) * Percent1 / 100)
                 };
             }
             catch (Exception ex)
