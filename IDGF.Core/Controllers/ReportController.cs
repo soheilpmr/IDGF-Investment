@@ -142,8 +142,8 @@ namespace IDGF.Core.Controllers
             }
         }
         
-        [HttpPost(nameof(GetCashInflowReportAsync))]
-        public async Task<IActionResult> GetCashInflowReportAsync(
+        [HttpPost(nameof(GetCashInflowReport))]
+        public async Task<IActionResult> GetCashInflowReport(
             [FromQuery] DateOnly? transactionDateFrom = null, 
             [FromQuery] DateOnly? transactionDateTo = null)
         {
@@ -164,8 +164,8 @@ namespace IDGF.Core.Controllers
             }
         }
 
-        [HttpGet(nameof(GetBondAndTransactionSummaryAsync))]
-        public async Task<IActionResult> GetBondAndTransactionSummaryAsync(DateOnly dateOnly, int percent1, int percent2)
+        [HttpGet(nameof(GetBondAndTransactionSummary))]
+        public async Task<IActionResult> GetBondAndTransactionSummary(DateOnly dateOnly, int percent1, int percent2)
         {
             try
             {
