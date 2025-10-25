@@ -621,8 +621,8 @@ namespace IDGF.Core.Services
                     ChecksInTransit = result.DarRah,
                     InvestmentBalance = result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid,
                     TotalSum = result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid + ((decimal)result.Mablagh),
-                    CanbekeptwiththeCentralBank30 = (result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid + ((decimal)result.Mablagh)) * Percent1 / 100,
-                    Investable70 = (result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid + ((decimal)result.Mablagh)) * Percent2 / 100,
+                    CanbekeptwiththeCentralBank30 = (result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid + ((decimal)result.Mablagh)) * Percent2 / 100,
+                    Investable70 = (result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid + ((decimal)result.Mablagh)) * Percent1 / 100,
                     Surplus = (result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid) -
               ((result.TotalSumePartnershipBondKharid + result.TotalSumeEjareDolatKharid + result.TotalSumKhazaneKharid + ((decimal)result.Mablagh)) * Percent2 / 100)
                 };
