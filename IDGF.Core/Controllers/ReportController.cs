@@ -120,8 +120,8 @@ namespace IDGF.Core.Controllers
             }
         }
 
-        [HttpPost(nameof(GetInvestmentReportAsync))]
-        public async Task<IActionResult> GetInvestmentReportAsync(
+        [HttpPost(nameof(GetInvestmentReport))]
+        public async Task<IActionResult> GetInvestmentReport(
             [FromQuery] DateOnly? transactionDateFrom = null, 
             [FromQuery] DateOnly? transactionDateTo = null)
         {
