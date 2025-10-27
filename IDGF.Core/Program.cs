@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using AutoMapper;
+using IDGF.Core.Infrastructure.Repositories.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +63,9 @@ builder.Services.AddScoped<BondsService, BondsService>();
 builder.Services.AddScoped<BondsTypeService, BondsTypeService>();
 builder.Services.AddScoped<BrokerageService, BrokerageService>();
 builder.Services.AddScoped<TransactionService, TransactionService>();
+builder.Services.AddScoped<IMeetingBusinessService, MeetingBusinessService>();
+builder.Services.AddScoped<MeetingFilesService, MeetingFilesService>();
+builder.Services.AddScoped<MeetingsService, MeetingsService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>

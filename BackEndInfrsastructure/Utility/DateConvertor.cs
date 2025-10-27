@@ -29,5 +29,16 @@ namespace BackEndInfrastructure.Utility
             var dateTime = persianCalendar.ToDateTime(year, month, day, 0, 0, 0, 0);
             return DateOnly.FromDateTime(dateTime);
         }
+
+        public static (string Date, string Time) GetCurrentPersianDateTimeStrings()
+        {
+            var pc = new PersianCalendar();
+            var now = DateTime.Now;
+
+            string date = $"{pc.GetYear(now)}{pc.GetMonth(now):D2}{pc.GetDayOfMonth(now):D2}";
+            string time = $"{now.Hour:D2}{now.Minute:D2}{now.Second:D2}";
+
+            return (date, time);
+        }
     }
 }

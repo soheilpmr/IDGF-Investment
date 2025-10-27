@@ -17,6 +17,8 @@ namespace IDGF.Core.Infrastructure.UnitOfWork
             BondsTypeRP = new BondsTypeRepository(base._dbContext);
             BrokerageRP = new BrokerageRepository(base._dbContext);
             TransactionRP = new TransactionsRepository(base._dbContext);
+            MeetingsRP = new MeetingsRepository(base._dbContext);
+            MeetingFilesRP = new MeetingsFileRepository(base._dbContext);
         }
 
         public IMandehTransactionsRepositories MandehTransactionsRP { get; private set; }
@@ -24,6 +26,8 @@ namespace IDGF.Core.Infrastructure.UnitOfWork
         public IBondsTypeRepository BondsTypeRP { get; private set; }
         public IBrokerageRepository BrokerageRP { get; private set; }
         public ITransactionsRepository TransactionRP { get; private set; }
+        public IMeetingsRepository MeetingsRP { get; private set; }
+        public IMeetingFileRepository MeetingFilesRP { get; private set; }
 
         public ILDRCompatibleRepositoryAsync<T, PrimKey> GetRepo<T, PrimKey>()
             where T : Model<PrimKey>
@@ -54,6 +58,16 @@ namespace IDGF.Core.Infrastructure.UnitOfWork
             if (typeof(T) == typeof(Transactions))
             {
                 ff = TransactionRP as ILDRCompatibleRepositoryAsync<T, PrimKey>;
+
+            }
+            if (typeof(T) == typeof(Meeting))
+            {
+                ff = MeetingsRP as ILDRCompatibleRepositoryAsync<T, PrimKey>;
+
+            }
+            if (typeof(T) == typeof(MeetingFile))
+            {
+                ff = MeetingFilesRP as ILDRCompatibleRepositoryAsync<T, PrimKey>;
 
             }
 

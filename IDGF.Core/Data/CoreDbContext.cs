@@ -25,6 +25,8 @@ namespace IDGF.Core.Data
         public DbSet<BrokerageEntity> Brokerages { get; set; }
         public DbSet<TransactionsEntity> Transactions { get; set; }
         public DbSet<CouponPaymentsEntity> CouponPayments { get; set; }
+        public DbSet<MeetingEntity> Meetings { get; set; }
+        public DbSet<MeetingFileEntity> MeetingFiles { get; set; }
 
         #region Query-Sets
         public DbSet<TransactionBasicViewEntity> TransactionBasicViews { get; set; }
@@ -38,6 +40,8 @@ namespace IDGF.Core.Data
             modelBuilder.ApplyConfiguration(new BrokerageConfiguration());
             modelBuilder.ApplyConfiguration(new TransactionsConfiguration());
             modelBuilder.ApplyConfiguration(new CouponPaymentsConfiguration());
+            modelBuilder.ApplyConfiguration(new MeetingsConfiguration());
+            modelBuilder.ApplyConfiguration(new MeetingFilesConfiguration());
 
             modelBuilder.Entity<TransactionBasicViewEntity>().ToView("vw_TransactionBasic");
         }

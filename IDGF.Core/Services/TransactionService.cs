@@ -4,6 +4,7 @@ using BackEndInfrastructure.DynamicLinqCore;
 using BackEndInfrastructure.Infrastructure;
 using BackEndInfrastructure.Infrastructure.Exceptions;
 using BackEndInfrastructure.Infrastructure.Service;
+using BackEndInfrastructure.Utility;
 using IDGF.Core.Controllers.Dtos;
 using IDGF.Core.Data.Entities;
 using IDGF.Core.Domain;
@@ -29,13 +30,16 @@ namespace IDGF.Core.Services
         private readonly IMapper _mapper;
         private readonly ILDRCompatibleRepositoryAsync<Transactions, decimal> _baseRepo;
         private readonly BondsService bondsService;
+        private readonly IConfiguration _configuration;
 
-        public TransactionService(ILogger<Transactions> logger, ICoreUnitOfWork coreUnitOfWork, IMapper mapper, BondsService bondsService) : base(logger, _serviceLogNumber)
+        public TransactionService(ILogger<Transactions> logger, ICoreUnitOfWork coreUnitOfWork,
+            IMapper mapper, BondsService bondsService, IConfiguration configuration) : base(logger, _serviceLogNumber)
         {
             _coreUnitOfWork = coreUnitOfWork;
             _baseRepo = _coreUnitOfWork.GetRepo<Transactions, decimal>();
             _mapper = mapper;
             this.bondsService = bondsService;
+            _configuration = configuration;
         }
 
         public override Task<decimal> AddAsync(Transactions item)
@@ -49,6 +53,8 @@ namespace IDGF.Core.Services
                 throw new UploadFileException("No file uploaded.");
             try
             {
+                await SaveFileToPermanentStorage(melliFile, "Melli", "exp_Melli");
+
                 var tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.xlsx");
                 await using (var stream = new FileStream(tempPath, FileMode.Create))
                     await melliFile.CopyToAsync(stream);
@@ -149,6 +155,7 @@ namespace IDGF.Core.Services
                 throw new UploadFileException("No file uploaded.");
             try
             {
+                await SaveFileToPermanentStorage(mellatFile, "Mellat", "exp_Mellat");
 
                 var tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.xlsx");
                 await using (var stream = new FileStream(tempPath, FileMode.Create))
@@ -254,6 +261,8 @@ namespace IDGF.Core.Services
             {
                 if (keshavarziFile == null || keshavarziFile.Length == 0)
                     throw new UploadFileException("No file uploaded.");
+
+                await SaveFileToPermanentStorage(keshavarziFile, "Keshavarzi", "exp_Bki");
 
                 var tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.xlsx");
                 await using (var stream = new FileStream(tempPath, FileMode.Create))
@@ -395,6 +404,8 @@ namespace IDGF.Core.Services
             {
                 if (sanatFile == null || sanatFile.Length == 0)
                     throw new UploadFileException("No file uploaded.");
+
+                await SaveFileToPermanentStorage(sanatFile, "Sanat", "exp_Sanat");
 
                 var tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.xlsx");
                 await using (var stream = new FileStream(tempPath, FileMode.Create))
@@ -906,6 +917,29 @@ namespace IDGF.Core.Services
         protected override Task ValidateOnModifyAsync(Transactions recievedItem, Transactions storageItem)
         {
             throw new NotImplementedException();
+        }
+
+        private async Task<string> SaveFileToPermanentStorage(IFormFile file, string brokerFolder, string brokerFilePrefix)
+        {
+            var baseUploadPath = _configuration["FileStorageSettings:BaseUploadPath"];
+            if (string.IsNullOrWhiteSpace(baseUploadPath))
+            {
+                throw new InvalidOperationException("File storage path is not configured.");
+            }
+
+            var brokerPath = Path.Combine(baseUploadPath, brokerFolder);
+            Directory.CreateDirectory(brokerPath); 
+
+            var (date, time) = DateConvertor.GetCurrentPersianDateTimeStrings();
+            var fileName = $"{brokerFilePrefix}_{date}_{time}{Path.GetExtension(file.FileName)}";
+            var permanentPath = Path.Combine(brokerPath, fileName);
+
+            await using (var stream = new FileStream(permanentPath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return permanentPath;
         }
     }
 }
