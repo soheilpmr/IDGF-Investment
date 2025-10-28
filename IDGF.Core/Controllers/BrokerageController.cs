@@ -94,7 +94,7 @@ namespace IDGF.Core.Controllers
 
                 var newId = await _brokerageService.AddAsync(brokerage);
 
-                return CreatedAtAction(nameof(GetBrokerageById), new { id = newId }, new { id = newId });
+                return CreatedAtAction(nameof(GetBrokerageById), new { id = newId }, new { result = new { newId, createDto.Name } });
             }
             catch (ServiceModelValidationException ex)
             {

@@ -16,11 +16,11 @@ namespace IDGF.Core.Infrastructure.Repositories.Implemention
 
         public async Task<IReadOnlyList<Brokerage>> GetAllForDropDown()
         {
-            var result = _context.Brokerages.Select(ss => new Brokerage()
+            var result = _context.Brokerages.Where(ss => ss.IsDeleted == false).Select(ss => new Brokerage()
             {
                 ID = ss.ID,
                 Name = ss.Name
-            }).ToList();
+            }).OrderBy(ss => ss.ID).ToList();
 
             return result;
         }
