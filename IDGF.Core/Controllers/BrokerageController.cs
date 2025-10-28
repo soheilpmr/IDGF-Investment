@@ -92,9 +92,9 @@ namespace IDGF.Core.Controllers
             {
                 var brokerage = _mapper.Map<Brokerage>(createDto);
 
-                var newId = await _brokerageService.AddAsync(brokerage);
+                var Id = await _brokerageService.AddAsync(brokerage);
 
-                return CreatedAtAction(nameof(GetBrokerageById), new { id = newId }, new { result = new { newId, createDto.Name } });
+                return CreatedAtAction(nameof(GetBrokerageById), new { id = Id },  new { Id, createDto.Name});
             }
             catch (ServiceModelValidationException ex)
             {
