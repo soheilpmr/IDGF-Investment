@@ -557,7 +557,7 @@ namespace IDGF.Core.Services
             }
         }
 
-        public async Task<string> ApproveMultiTask(List<decimal> Ids)
+        public async Task<string> ApproveTransactions(List<decimal> Ids)
         {
             try
             {
@@ -589,7 +589,7 @@ namespace IDGF.Core.Services
             }   
         }
 
-        public async Task<string> RejectMultiTask(List<decimal> Ids)
+        public async Task<string> RejectTransactions(List<decimal> Ids)
         {
             try
             {

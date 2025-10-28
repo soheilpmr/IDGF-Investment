@@ -132,12 +132,12 @@ namespace IDGF.Core.Controllers
             }
         }
 
-        [HttpPost(nameof(ApproveMultiTask))]
-        public async Task<IActionResult> ApproveMultiTask(List<decimal> Ids)
+        [HttpPost(nameof(ApproveTransactions))]
+        public async Task<IActionResult> ApproveTransactions(List<decimal> Ids)
         {
             try
             {
-                await transactionService.ApproveMultiTask(Ids);
+                await transactionService.ApproveTransactions(Ids);
                 return Ok(new
                 {
                     Message = "✅ تراکنش‌ها با موفقیت تایید شدند.",
@@ -158,12 +158,12 @@ namespace IDGF.Core.Controllers
             }
         }
 
-        [HttpPost(nameof(RejectMultiTask))]
-        public async Task<IActionResult> RejectMultiTask(List<decimal> Ids)
+        [HttpPost(nameof(RejectTransactions))]
+        public async Task<IActionResult> RejectTransactions(List<decimal> Ids)
         {
             try
             {
-                await transactionService.RejectMultiTask(Ids);
+                await transactionService.RejectTransactions(Ids);
                 return Ok(new
                 {
                     Message = "X تراکنش‌ها با موفقیت رد شدند.",
