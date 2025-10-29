@@ -29,7 +29,7 @@ namespace IDGF.Core.Services
             _configuration = configuration;
         }
 
-        public async Task<int> CreateMeetingWithFilesAsync(CreateMeetingRequestDto dto)
+        public async Task<MeetingResponseDto> CreateMeetingWithFilesAsync(CreateMeetingRequestDto dto)
         {
             var meetingDomain = new Meeting
             {
@@ -49,13 +49,27 @@ namespace IDGF.Core.Services
             var t4 = SaveFileAndCreateRecordAsync(dto.PurchasedBondsReport, meetingEntity, MeetingFileTypes.PurchasedBondsReport);
             var t5 = SaveFileAndCreateRecordAsync(dto.Report30To70, meetingEntity, MeetingFileTypes.Report30To70);
 
-            Task.WaitAll(t1, t2, t3, t4, t5);
+            var resultsArray = await Task.WhenAll(t1, t2, t3, t4, t5);
+            var savedFileEntities = resultsArray.Where(f => f != null).ToList();
 
             try
             {
                 await _coreUnitOfWork.CommitAsync();
                 _logger.LogInformation("Successfully created meeting {MeetingID} with files.", meetingEntity.ID);
-                return meetingEntity.ID;
+                var dtoToReturn = new MeetingResponseDto
+                {
+                    ID = meetingEntity.ID,
+                    MeetingDate = meetingEntity.MeetingDate.ToString("yyyy-MM-dd"),
+                    Description = meetingEntity.Description,
+
+                    HasMinutes = savedFileEntities.Any(f => f.FileType == MeetingFileTypes.Minutes),
+                    HasMaturedBondsReport = savedFileEntities.Any(f => f.FileType == MeetingFileTypes.MaturedBondsReport),
+                    HasCashFlowReport = savedFileEntities.Any(f => f.FileType == MeetingFileTypes.CashFlowReport),
+                    HasPurchasedBondsReport = savedFileEntities.Any(f => f.FileType == MeetingFileTypes.PurchasedBondsReport),
+                    HasReport30To70 = savedFileEntities.Any(f => f.FileType == MeetingFileTypes.Report30To70)
+                };
+
+                return dtoToReturn;
             }
             catch (Exception ex)
             {
@@ -121,6 +135,39 @@ namespace IDGF.Core.Services
                 _logger.LogError(ex, "Error retrieving meeting list.");
                 throw new ServiceStorageException("Error retrieving meeting list", ex, _serviceLogNumber);
             }
+        }
+
+        public async Task<MeetingDetailDto> GetMeetingByIdWithFilesAsync(int id)
+        {
+            var meeting = await _coreUnitOfWork.MeetingsRP.GetByIdAsync(id);
+            if (meeting == null)
+            {
+                throw new ServiceObjectNotFoundException(typeof(Meeting).Name + " not found");
+            }
+
+            var allFiles = await _coreUnitOfWork.MeetingFilesRP.AllItemsAsync();
+            var relatedFiles = allFiles
+                                .Where(f => f.MeetingID == id)
+                                .Select(f => new MeetingFileDto 
+                                {
+                                    ID = f.ID,
+                                    FileType = f.FileType,
+                                    OriginalFileName = f.OriginalFileName,
+                                    FileSizeKB = f.FileSizeKB
+                                })
+                                .ToList();
+
+            var detailDto = new MeetingDetailDto
+            {
+                ID = meeting.ID,
+                MeetingDate = meeting.MeetingDate,
+                Description = meeting.Description,
+                CreatedByUserID = meeting.CreatedByUserID,
+                CreatedAt = meeting.CreatedAt,
+                Files = relatedFiles
+            };
+
+            return detailDto;
         }
 
         public async Task<Meeting> GetMeetingByIdAsync(int id)
@@ -200,11 +247,11 @@ namespace IDGF.Core.Services
 
 
 
-        private async Task SaveFileAndCreateRecordAsync(IFormFile? file, MeetingEntity meetingEntity, string fileType)
+        private async Task<MeetingFileEntity?> SaveFileAndCreateRecordAsync(IFormFile? file, MeetingEntity meetingEntity, string fileType)
         {
             if (file == null || file.Length == 0)
             {
-                return;
+                return null;
             }
 
             var baseUploadPath = _configuration["FileStorageSettings:BaseUploadPath"];
@@ -252,6 +299,7 @@ namespace IDGF.Core.Services
             fileEntity.Meeting = meetingEntity;
 
             meetingEntity.Files.Add(fileEntity);
+            return fileEntity;
         }
 
         private string GetMimeType(string fileName)
