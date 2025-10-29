@@ -65,7 +65,7 @@ namespace IDGF.Core.Controllers
             }
         }
 
-        [HttpGet("GetBrokerageById")]
+        [HttpGet(nameof(GetBrokerageById))]
         public async Task<ActionResult<Brokerage>> GetBrokerageById(int id)
         {
             try
@@ -85,7 +85,7 @@ namespace IDGF.Core.Controllers
             }
         }
 
-        [HttpPost("CreateBrokerage")]
+        [HttpPost(nameof(CreateBrokerage))]
         public async Task<IActionResult> CreateBrokerage([FromBody] BrokerageCreateDto createDto)
         {
             try
@@ -108,7 +108,7 @@ namespace IDGF.Core.Controllers
             }
         }
 
-        [HttpPut("UpdateBrokerage")]
+        [HttpPut(nameof(UpdateBrokerage))]
         public async Task<IActionResult> UpdateBrokerage(int id, [FromBody] BrokerageUpdateDto updateDto)
         {
             try
@@ -136,7 +136,7 @@ namespace IDGF.Core.Controllers
             }
         }
 
-        [HttpDelete("DeleteBrokerage")]
+        [HttpDelete(nameof(DeleteBrokerage))]
         public async Task<IActionResult> DeleteBrokerage(int id)
         {
             try
