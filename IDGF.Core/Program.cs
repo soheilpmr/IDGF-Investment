@@ -54,6 +54,7 @@ builder.Services.AddSwaggerGen(
     });
 
 builder.Services.AddDbContext<CoreDbContext>();
+builder.Services.AddDbContext<WorkFlowDbContext>();
 // Current
 builder.Services.AddAutoMapper(cfg => cfg.LicenseKey = "<License Key Here>", typeof(Program));
 

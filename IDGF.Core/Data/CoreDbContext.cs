@@ -30,7 +30,7 @@ namespace IDGF.Core.Data
 
         #region Query-Sets
         public DbSet<TransactionBasicViewEntity> TransactionBasicViews { get; set; }
-        #endregion  
+        #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
