@@ -34,9 +34,9 @@ namespace IDGF.Core.Controllers
 
             try
             {
-                var newMeetingId = await _meetingService.CreateMeetingWithFilesAsync(request);
+                var newMeetingDto = await _meetingService.CreateMeetingWithFilesAsync(request);
 
-                return CreatedAtAction(nameof(GetMeeting), new { id = newMeetingId }, new { id = newMeetingId });
+                return CreatedAtAction(nameof(GetMeeting), new { id = newMeetingDto.ID }, newMeetingDto);
             }
             catch (ServiceException ex)
             {
@@ -52,7 +52,7 @@ namespace IDGF.Core.Controllers
 
         [HttpPost]
         [Route(nameof(GetMeetingList))]
-        public async Task<ActionResult<LinqDataResult<MeetingResponseDto>>> GetMeetingList()
+        public async Task<ActionResult<LinqDataResult<MeetingResponseDto>>> GetMeetingList() 
         {
             try
             {
@@ -78,7 +78,7 @@ namespace IDGF.Core.Controllers
         {
             try
             {
-                var result = await _meetingService.GetMeetingByIdAsync(id);
+                var result = await _meetingService.GetMeetingByIdWithFilesAsync(id);
                 return Ok(result);
             }
             catch (ServiceObjectNotFoundException ex)
