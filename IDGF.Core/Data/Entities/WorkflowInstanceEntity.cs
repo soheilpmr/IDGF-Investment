@@ -6,6 +6,21 @@ namespace IDGF.Core.Data.Entities
     [Table("opt_WorkflowInstances")]
     public class WorkflowInstanceEntity : WorkflowInstance
     {
+        public WorkflowInstanceEntity()
+        {
+            
+        }
+
+        public WorkflowInstanceEntity(WorkflowInstance workflowInstance)
+        {
+            WorkflowDefinitionId = workflowInstance.WorkflowDefinitionId;
+            ReportId = workflowInstance.ReportId;
+            CurrentStepKey = workflowInstance.CurrentStepKey;
+            Status = workflowInstance.Status;
+            CreatedBy = workflowInstance.CreatedBy;
+            CreatedDate = workflowInstance.CreatedDate;
+        }
+
         public ICollection<WorkflowHistoryEntity>? WorkflowHistoryEntities { get; set; }
 
         [ForeignKey(nameof(WorkflowDefinitionId))]

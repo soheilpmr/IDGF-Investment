@@ -13,5 +13,6 @@ namespace IDGF.Core.Infrastructure.UnitOfWork
         ITransactionsRepository TransactionRP { get; }
         IMeetingsRepository MeetingsRP { get; }
         IMeetingFileRepository MeetingFilesRP { get; }
+        //IReportRepository ReportRP { get; }
     }
 }

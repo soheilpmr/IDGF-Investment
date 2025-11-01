@@ -19,6 +19,7 @@ namespace IDGF.Core.Infrastructure.UnitOfWork
             TransactionRP = new TransactionsRepository(base._dbContext);
             MeetingsRP = new MeetingsRepository(base._dbContext);
             MeetingFilesRP = new MeetingsFileRepository(base._dbContext);
+            //ReportRP = new ReportRepository(_workflowDbContext);
         }
 
         public IMandehTransactionsRepositories MandehTransactionsRP { get; private set; }
@@ -28,6 +29,7 @@ namespace IDGF.Core.Infrastructure.UnitOfWork
         public ITransactionsRepository TransactionRP { get; private set; }
         public IMeetingsRepository MeetingsRP { get; private set; }
         public IMeetingFileRepository MeetingFilesRP { get; private set; }
+        //public IReportRepository ReportRP { get; private set; }
 
         public ILDRCompatibleRepositoryAsync<T, PrimKey> GetRepo<T, PrimKey>()
             where T : Model<PrimKey>

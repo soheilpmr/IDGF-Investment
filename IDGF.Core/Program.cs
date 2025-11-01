@@ -1,15 +1,17 @@
+using AutoMapper;
 using IdentityModel;
 using IDGF.Core.Data;
+using IDGF.Core.Infrastructure.Repositories.Interface;
 using IDGF.Core.Infrastructure.UnitOfWork;
 using IDGF.Core.Services;
+using IDGF.Core.Services.WorkFlow;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using AutoMapper;
-using IDGF.Core.Infrastructure.Repositories.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,6 +61,8 @@ builder.Services.AddDbContext<WorkFlowDbContext>();
 builder.Services.AddAutoMapper(cfg => cfg.LicenseKey = "<License Key Here>", typeof(Program));
 
 builder.Services.AddScoped<ICoreUnitOfWork, CoreUnitOfWork>();
+builder.Services.AddScoped<IWorkflowUnitOfWork, WorkflowUnitOfWork>();
+
 builder.Services.AddScoped<MandehtransactionService, MandehtransactionService>();
 builder.Services.AddScoped<BondsService, BondsService>();
 builder.Services.AddScoped<BondsTypeService, BondsTypeService>();
@@ -67,6 +71,9 @@ builder.Services.AddScoped<TransactionService, TransactionService>();
 builder.Services.AddScoped<IMeetingBusinessService, MeetingBusinessService>();
 builder.Services.AddScoped<MeetingFilesService, MeetingFilesService>();
 builder.Services.AddScoped<MeetingsService, MeetingsService>();
+builder.Services.AddScoped<ReportService, ReportService>();
+builder.Services.AddScoped<IWorkflowService, WorkFlowService>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -99,10 +106,16 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dataContext = scope.ServiceProvider.GetRequiredService<WorkFlowDbContext>();
+    dataContext.Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
 //{
-    app.UseSwagger();
+app.UseSwagger();
     app.UseSwaggerUI();
 //}
 if (app.Environment.EnvironmentName == "Docker")

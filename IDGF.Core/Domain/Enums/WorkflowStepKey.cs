@@ -2,8 +2,10 @@
 {
     public enum WorkflowStepKey
     {
-        Draft=1,
-        Review=2,
-        Approved=3
+        Rejected = 0,
+        StartByExpert = 1,
+        MidLevelMangerReview = 2,
+        ExecutiveManager = 3,
+        Approved = 4
     }
 }

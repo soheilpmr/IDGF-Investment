@@ -4,6 +4,7 @@ using IDGF.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IDGF.Core.Migrations
 {
     [DbContext(typeof(WorkFlowDbContext))]
-    partial class WorkFlowDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251029133714_EditWorkflowDefinitionEntity")]
+    partial class EditWorkflowDefinitionEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,9 +52,8 @@ namespace IDGF.Core.Migrations
                     b.Property<DateTime>("UploadedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UploadedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("UploadedBy")
+                        .HasColumnType("int");
 
                     b.HasKey("ID");
 
@@ -206,11 +208,12 @@ namespace IDGF.Core.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte>("FromStepKey")
-                        .HasColumnType("tinyint");
+                    b.Property<string>("FromStepKey")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte?>("ToStepKey")
-                        .HasColumnType("tinyint");
+                    b.Property<string>("ToStepKey")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("WorkflowDefinitionId")
                         .HasColumnType("int");

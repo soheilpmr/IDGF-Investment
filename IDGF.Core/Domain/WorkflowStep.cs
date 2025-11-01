@@ -12,6 +12,6 @@ namespace IDGF.Core.Domain
 
         // Role or comma-separated roles allowed to perform actions here
         public string? AssignedRole { get; set; } // e.g. "Reporter", "Reviewer"
-        public string? PossibleActions { get; set; } // e.g. "Submit,Approve,Reject,Return"
+        public string? PossibleActions { get; set; } // e.g. "Submit,Approve,Reject,Return,Finish"
     }
 }

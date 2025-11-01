@@ -4,6 +4,7 @@ using IDGF.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IDGF.Core.Migrations
 {
     [DbContext(typeof(WorkFlowDbContext))]
-    partial class WorkFlowDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251101093300_EditWorkFlowStep")]
+    partial class EditWorkFlowStep
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

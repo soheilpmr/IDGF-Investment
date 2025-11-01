@@ -8,5 +8,6 @@ namespace IDGF.Core.Data.Entities
     {
         public ICollection<WorkflowStepEntity>? WorkflowStepEntities { get; set; }
         public ICollection<WorkflowTransitionEntity>? WorkflowTransitionEntities { get; set; }
+        public ICollection<WorkflowInstanceEntity>? WorkflowInstanceEntities { get; set; }
     }
 }
