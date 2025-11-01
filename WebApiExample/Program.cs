@@ -6,7 +6,9 @@ using IDGFAuth.Data.Entities;
 using IDGFAuth.Infrastructure.Initializer;
 using IDGFAuth.Infrastructure.UnitOfWork;
 using IDGFAuth.Services;
+using IDGFAuth.Services.EmailService;
 using IDGFAuth.Services.JWT;
+using IDGFAuth.Services.UserServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -177,6 +179,9 @@ builder.Services.AddScoped<IWebApiUnitOfWorkAsync, WebApiUnitOfWorkAsync>();
 builder.Services.AddScoped<IJWTService, JWTService>();
 builder.Services.AddScoped(typeof(IIdentityAdminService<,>), typeof(IdentityAdminService<,>));
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddHttpContextAccessor();
 // End Infrastructure Implemention
 builder.Services.AddCors(options =>
 {
